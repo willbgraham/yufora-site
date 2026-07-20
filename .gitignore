@@ -8,6 +8,9 @@
 # production
 /build
 
+# local embedded database (dev only)
+/.pglite/
+
 # misc
 .DS_Store
 *.pem
