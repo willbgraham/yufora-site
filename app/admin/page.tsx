@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { connectStripe } from "@/app/actions/stripe";
 import CreateCharityForm from "@/components/admin/CreateCharityForm";
+import EmbedSnippet from "@/components/admin/EmbedSnippet";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { siteConfig } from "@/lib/site";
 import { getCharityForUser } from "@/lib/data/charity";
 import { getTotalsForCharity } from "@/lib/data/contributions";
 import { getProductsForCharity } from "@/lib/data/products";
@@ -167,25 +169,35 @@ export default async function AdminPage() {
           )}
         </div>
 
-        {/* Step 3 — embed (next phase) */}
+        {/* Step 3 — embed */}
         <div className="rounded-xl border border-warm-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <span aria-hidden="true" className="font-display text-3xl text-pink-200">
               3
             </span>
-            <StepBadge tone="soon">Coming next</StepBadge>
+            <StepBadge tone={published > 0 ? "done" : "soon"}>
+              {published > 0 ? "Ready" : "Publish a product first"}
+            </StepBadge>
           </div>
           <h2 className="mt-3 text-lg text-warm-900">Embed your shop</h2>
           <p className="mt-1.5 text-sm text-warm-700">
-            One snippet to paste into your website, and you&rsquo;re live.
+            Paste this into any &ldquo;embed&rdquo; or &ldquo;custom
+            HTML&rdquo; box — Squarespace, WordPress, Wix all have one.
           </p>
+          <div className="mt-4">
+            <EmbedSnippet
+              snippet={`<script src="${siteConfig.url}/embed.js" data-shop="${charity.slug}" async></script>`}
+            />
+          </div>
+          <Link
+            href={`/embed/${charity.slug}`}
+            target="_blank"
+            className="mt-3 inline-block text-sm text-pink-700 hover:underline"
+          >
+            Preview the embed →
+          </Link>
         </div>
       </div>
-
-      <p className="mt-8 text-sm text-warm-600">
-        You&rsquo;re one of the first organizations in. The embed is being
-        built next — you&rsquo;ll see it appear here when it lands.
-      </p>
     </div>
   );
 }

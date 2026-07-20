@@ -2,7 +2,9 @@ import "server-only";
 import type Stripe from "stripe";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { charities, contributions, products } from "@/lib/db/schema";
+import { charities, contributions, products, user } from "@/lib/db/schema";
+import { sendDonorConfirmation } from "@/lib/donor-email";
+import { siteConfig } from "@/lib/site";
 
 /**
  * Pure event handling, separated from signature verification so it can be
@@ -42,10 +44,41 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
       if (inserted.length === 0) return "duplicate: already recorded";
 
       // Progress cache moves only when a new row was actually inserted.
-      await db
+      const [updated] = await db
         .update(products)
         .set({ fundedCents: sql`${products.fundedCents} + ${amount}` })
-        .where(eq(products.id, productId));
+        .where(eq(products.id, productId))
+        .returning({
+          title: products.title,
+          fundedCents: products.fundedCents,
+          goalCents: products.goalCents,
+        });
+
+      // The warm confirmation on behalf of the charity (Stripe's own receipt
+      // comes from the charity's account). Failures are logged, never thrown —
+      // the donation is already recorded.
+      const donorEmail = session.customer_details?.email;
+      if (donorEmail && updated) {
+        const rows = await db
+          .select({ name: charities.name, slug: charities.slug, ownerEmail: user.email })
+          .from(charities)
+          .innerJoin(user, eq(charities.ownerUserId, user.id))
+          .where(eq(charities.id, charityId))
+          .limit(1);
+        const charity = rows[0];
+        if (charity) {
+          await sendDonorConfirmation({
+            donorEmail,
+            donorName: session.customer_details?.name ?? null,
+            charityName: charity.name,
+            charityReplyTo: charity.ownerEmail,
+            productTitle: updated.title,
+            amountCents: amount,
+            productUrl: `${siteConfig.url}/s/${charity.slug}/p/${productId}`,
+            nowFullyFunded: updated.fundedCents >= updated.goalCents,
+          });
+        }
+      }
 
       return `recorded: ${inserted[0].id}`;
     }

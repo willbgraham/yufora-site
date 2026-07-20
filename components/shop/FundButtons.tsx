@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { startCheckout, type CheckoutState } from "@/app/actions/checkout";
 import { Button } from "@/components/ui/Button";
 import { formatCents } from "@/lib/money";
@@ -17,6 +17,14 @@ export default function FundButtons({
   const [state, formAction, pending] = useActionState(startCheckout, initial);
   const [chipOpen, setChipOpen] = useState(false);
   const [amount, setAmount] = useState("");
+
+  // Navigate the TOP window to Stripe: inside the embed iframe this breaks
+  // out (Checkout won't render in a frame); standalone, top === self.
+  useEffect(() => {
+    if (state.status === "redirect") {
+      (window.top ?? window).location.href = state.url;
+    }
+  }, [state]);
 
   const quickAmounts = [2500, 5000, 10000].filter((a) => a < remainingCents);
 

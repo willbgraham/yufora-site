@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { charities, products } from "@/lib/db/schema";
@@ -8,7 +7,9 @@ import { parseDollarsToCents } from "@/lib/money";
 import { MIN_CONTRIBUTION_CENTS, isStripeConfigured, stripe } from "@/lib/stripe";
 import { siteConfig } from "@/lib/site";
 
-export type CheckoutState = { status: "idle" | "error"; message?: string };
+export type CheckoutState =
+  | { status: "idle" | "error"; message?: string }
+  | { status: "redirect"; url: string };
 
 /**
  * Creates a Stripe Checkout session as a DIRECT charge on the charity's
@@ -18,6 +19,10 @@ export type CheckoutState = { status: "idle" | "error"; message?: string };
  * No contribution row is written here — the webhook creates it from session
  * metadata when payment completes, keyed by the unique session id. That way
  * abandoned checkouts leave nothing to clean up.
+ *
+ * Returns the session URL rather than redirect()ing: when the shop runs
+ * inside the embed iframe, the client must navigate window.top — Stripe
+ * Checkout refuses to render inside a frame.
  */
 export async function startCheckout(
   _prev: CheckoutState,
@@ -68,7 +73,6 @@ export async function startCheckout(
 
   const productUrl = `${siteConfig.url}/s/${charity.slug}/p/${product.id}`;
 
-  let sessionUrl: string;
   try {
     const session = await stripe().checkout.sessions.create(
       {
@@ -98,7 +102,7 @@ export async function startCheckout(
       { stripeAccount: charity.stripeAccountId },
     );
     if (!session.url) throw new Error("Checkout session has no URL");
-    sessionUrl = session.url;
+    return { status: "redirect", url: session.url };
   } catch (err) {
     console.error("[checkout] session create failed", err);
     return {
@@ -106,6 +110,4 @@ export async function startCheckout(
       message: "Couldn't start the donation — please try again in a moment.",
     };
   }
-
-  redirect(sessionUrl);
 }
