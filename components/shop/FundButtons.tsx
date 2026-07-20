@@ -10,9 +10,12 @@ const initial: CheckoutState = { status: "idle" };
 export default function FundButtons({
   productId,
   remainingCents,
+  context = "hosted",
 }: {
   productId: string;
   remainingCents: number;
+  /** Where the donor is giving from — decides where Stripe returns them. */
+  context?: "hosted" | "embed";
 }) {
   const [state, formAction, pending] = useActionState(startCheckout, initial);
   const [chipOpen, setChipOpen] = useState(false);
@@ -42,6 +45,7 @@ export default function FundButtons({
       <form action={formAction}>
         <input type="hidden" name="productId" value={productId} />
         <input type="hidden" name="mode" value="full" />
+        <input type="hidden" name="context" value={context} />
         <Button type="submit" size="lg" disabled={pending} className="w-full">
           {pending ? "One moment…" : `Fund this — ${formatCents(remainingCents)}`}
         </Button>
@@ -55,6 +59,7 @@ export default function FundButtons({
           >
             <input type="hidden" name="productId" value={productId} />
             <input type="hidden" name="mode" value="custom" />
+            <input type="hidden" name="context" value={context} />
             <p className="text-sm font-medium text-warm-900">
               Chip in toward it
             </p>

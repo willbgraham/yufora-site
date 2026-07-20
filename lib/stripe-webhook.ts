@@ -60,13 +60,31 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
       const donorEmail = session.customer_details?.email;
       if (donorEmail && updated) {
         const rows = await db
-          .select({ name: charities.name, slug: charities.slug, ownerEmail: user.email })
+          .select({
+            name: charities.name,
+            slug: charities.slug,
+            embedPageUrl: charities.embedPageUrl,
+            ownerEmail: user.email,
+          })
           .from(charities)
           .innerJoin(user, eq(charities.ownerUserId, user.id))
           .where(eq(charities.id, charityId))
           .limit(1);
         const charity = rows[0];
         if (charity) {
+          // Link the donor to the shop on the CHARITY's own site when it's
+          // configured (embed.js re-opens the item there); hosted page as
+          // fallback.
+          let productUrl = `${siteConfig.url}/s/${charity.slug}/p/${productId}`;
+          if (charity.embedPageUrl) {
+            try {
+              const u = new URL(charity.embedPageUrl);
+              u.searchParams.set("yufora_item", productId);
+              productUrl = u.toString();
+            } catch {
+              // keep hosted fallback
+            }
+          }
           await sendDonorConfirmation({
             donorEmail,
             donorName: session.customer_details?.name ?? null,
@@ -74,7 +92,7 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
             charityReplyTo: charity.ownerEmail,
             productTitle: updated.title,
             amountCents: amount,
-            productUrl: `${siteConfig.url}/s/${charity.slug}/p/${productId}`,
+            productUrl,
             nowFullyFunded: updated.fundedCents >= updated.goalCents,
           });
         }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { connectStripe } from "@/app/actions/stripe";
 import CreateCharityForm from "@/components/admin/CreateCharityForm";
+import EmbedPageUrlForm from "@/components/admin/EmbedPageUrlForm";
 import EmbedSnippet from "@/components/admin/EmbedSnippet";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/site";
@@ -189,6 +190,7 @@ export default async function AdminPage() {
               snippet={`<script src="${siteConfig.url}/embed.js" data-shop="${charity.slug}" async></script>`}
             />
           </div>
+          <EmbedPageUrlForm defaultValue={charity.embedPageUrl ?? ""} />
           <Link
             href={`/embed/${charity.slug}`}
             target="_blank"

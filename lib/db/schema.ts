@@ -100,6 +100,12 @@ export const charities = pgTable(
     stripeChargesEnabled: boolean("stripe_charges_enabled")
       .notNull()
       .default(false),
+    /**
+     * The page on the charity's own site where the shop is embedded.
+     * When set, embed checkouts return the donor there and donor emails
+     * link there — keeping the "runs on your website" promise end to end.
+     */
+    embedPageUrl: text("embed_page_url"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()

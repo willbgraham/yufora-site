@@ -28,6 +28,7 @@ export default async function EmbedProductPage({ params, searchParams }: Props) 
       donationsOpen={donationsOpen}
       donated={donated === "1"}
       backHref={`/embed/${charity.slug}`}
+      context="embed"
     />
   );
 }

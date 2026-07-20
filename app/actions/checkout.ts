@@ -24,12 +24,22 @@ export type CheckoutState =
  * inside the embed iframe, the client must navigate window.top — Stripe
  * Checkout refuses to render inside a frame.
  */
+/** Appends query params to a charity-site URL without clobbering existing ones. */
+function withParams(base: string, params: Record<string, string>): string {
+  const url = new URL(base);
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+  return url.toString();
+}
+
 export async function startCheckout(
   _prev: CheckoutState,
   formData: FormData,
 ): Promise<CheckoutState> {
   const productId = String(formData.get("productId") ?? "");
   const mode = String(formData.get("mode") ?? "");
+  // Where the donor is giving from: the charity's embedded shop or our
+  // hosted page. Determines where Stripe sends them back afterwards.
+  const context = formData.get("context") === "embed" ? "embed" : "hosted";
 
   const rows = await db
     .select({ product: products, charity: charities })
@@ -73,6 +83,23 @@ export async function startCheckout(
 
   const productUrl = `${siteConfig.url}/s/${charity.slug}/p/${product.id}`;
 
+  // Keep the "runs on your website" promise: donations made through the
+  // embed return the donor to the charity's own page (when configured),
+  // where embed.js re-opens the item and shows the thank-you.
+  let successUrl = `${productUrl}?donated=1`;
+  let cancelUrl = productUrl;
+  if (context === "embed" && charity.embedPageUrl) {
+    try {
+      successUrl = withParams(charity.embedPageUrl, {
+        yufora_thanks: "1",
+        yufora_item: product.id,
+      });
+      cancelUrl = withParams(charity.embedPageUrl, { yufora_item: product.id });
+    } catch {
+      // Malformed stored URL — fall back to the hosted page.
+    }
+  }
+
   try {
     const session = await stripe().checkout.sessions.create(
       {
@@ -95,8 +122,8 @@ export async function startCheckout(
           yuforaProductId: product.id,
           yuforaCharityId: charity.id,
         },
-        success_url: `${productUrl}?donated=1`,
-        cancel_url: productUrl,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
       },
       // The direct-charge part: the session lives on the charity's account.
       { stripeAccount: charity.stripeAccountId },

@@ -21,12 +21,14 @@ export default function ProductView({
   donationsOpen,
   donated,
   backHref,
+  context = "hosted",
 }: {
   charity: Charity;
   product: ProductWithPhotos;
   donationsOpen: boolean;
   donated: boolean;
   backHref: string;
+  context?: "hosted" | "embed";
 }) {
   const video = product.videoUrl ? parseVideoUrl(product.videoUrl) : null;
   const funded = product.fundedCents >= product.goalCents;
@@ -125,7 +127,11 @@ export default function ProductView({
                 This item is fully funded. Thank you!
               </p>
             ) : donationsOpen ? (
-              <FundButtons productId={product.id} remainingCents={remaining} />
+              <FundButtons
+                productId={product.id}
+                remainingCents={remaining}
+                context={context}
+              />
             ) : (
               <>
                 <Button size="lg" className="w-full" disabled>

@@ -25,8 +25,25 @@
     return;
   }
 
+  // If the donor was just sent back from checkout, the charity's page URL
+  // carries yufora_item / yufora_thanks — open the iframe straight to that
+  // item (with the thank-you banner when the payment completed).
+  var src = origin + "/embed/" + encodeURIComponent(shop);
+  try {
+    var host = new URL(window.location.href);
+    var item = host.searchParams.get("yufora_item");
+    if (item && /^[\w-]{1,64}$/.test(item)) {
+      src += "/p/" + encodeURIComponent(item);
+      if (host.searchParams.get("yufora_thanks") === "1") {
+        src += "?donated=1";
+      }
+    }
+  } catch {
+    /* older browsers: plain grid */
+  }
+
   var iframe = document.createElement("iframe");
-  iframe.src = origin + "/embed/" + encodeURIComponent(shop);
+  iframe.src = src;
   iframe.title = "Wishlist shop";
   iframe.style.display = "block";
   iframe.style.width = "100%";
