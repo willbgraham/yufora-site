@@ -1,12 +1,116 @@
-html,
-body {
-  margin: 0;
-  height: 100%;
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Yufora design tokens
+   Brand pink #ED1B58 was sampled directly from public/yufora1200.png.
+   It measures 4.29:1 against white — large text only, NOT body text.
+   Hence the split: pink-500 is the identity colour, pink-600 is the
+   interactive one (white on it = 5.46:1, passes AA at any size).
+   Never put white text on pink-500 at body size.
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Brand — hue 343 held constant, lightness swept */
+  --color-pink-50: #fceef2;
+  --color-pink-100: #f9dce4;
+  --color-pink-200: #f8b4c8;
+  --color-pink-300: #f486a5;
+  --color-pink-400: #ef527f;
+  --color-pink-500: #ed1b58; /* identity: logo, display type, decorative */
+  --color-pink-600: #d01047; /* interactive: buttons, links, focus rings */
+  --color-pink-700: #aa0d3a;
+  --color-pink-800: #890b2f;
+  --color-pink-900: #6d0925;
+  --color-pink-950: #470618;
+
+  /* Neutrals — warm/rose tinted (hue ~340), not blue-grey.
+     Blue-grey reads corporate and fights the brand. */
+  --color-warm-50: #faf7f8;
+  --color-warm-100: #f4eff1;
+  --color-warm-200: #e8dfe2;
+  --color-warm-300: #d5c7cc;
+  --color-warm-400: #ab9ca1; /* 2.62:1 — decorative only, never text */
+  --color-warm-500: #8a787e;
+  --color-warm-600: #6b5b61; /* 6.37:1 — muted text */
+  --color-warm-700: #53464a; /* 8.96:1 — body text */
+  --color-warm-800: #3a3033;
+  --color-warm-900: #272123; /* 15.81:1 — headings */
+  --color-warm-950: #1a1618;
+
+  /* Accent — near-complement of the pink (hue 172 vs 343), and the
+     conventional nonprofit trust signal. */
+  --color-teal-50: #edf7f5;
+  --color-teal-100: #d3ece7;
+  --color-teal-600: #238b7d;
+  --color-teal-700: #1c6e63; /* 6.07:1 — safe for text */
+  --color-teal-900: #0f3d37;
+
+  /* Typography */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  /* Fluid display sizes — scale smoothly instead of stepping at breakpoints */
+  --text-display: clamp(2.25rem, 5.5vw, 3.5rem);
+  --text-display-lg: clamp(2.75rem, 7vw, 4.5rem);
+
+  /* Radii — the wordmark is geometric with hard terminals, so stay restrained.
+     Pill buttons would read consumer-app, not trustworthy infrastructure. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Vertical rhythm between marketing sections */
+  --spacing-section: 4rem;
+  --spacing-section-lg: 7rem;
 }
 
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: white;
+    color: var(--color-warm-700);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-warm-900);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Visible focus everywhere. pink-600 was chosen partly because a focus
+     ring must itself clear 3:1 against the background. */
+  :focus-visible {
+    outline: 2px solid var(--color-pink-600);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
