@@ -65,21 +65,17 @@ noted):
 
 ## Part B — Email (Resend)
 
-- [ ] Create a free account at **resend.com** (3,000 emails/month free)
-- [ ] **Domains → Add Domain** → `yufora.com` → add the DNS records Resend
-      shows you at your domain registrar → wait for **Verified** (minutes to
-      hours depending on DNS)
-- [ ] **API Keys → Create** → scope *Sending access* → copy the `re_…` value
-      (shown only once)
-- [ ] Add env vars (Preview + Production):
-  - [ ] `RESEND_API_KEY` — the `re_…` key
-  - [ ] `LEAD_NOTIFY_TO` — `willg1@gmail.com` (where marketing-site leads land)
-  - [ ] `LEAD_NOTIFY_FROM` — e.g. `hello@yufora.com` (must be on the verified
-        domain). Sign-in links and donor emails also send from this address
-        unless you later set `AUTH_EMAIL_FROM` / `DONOR_EMAIL_FROM` separately.
-- [ ] Redeploy, then verify: request a sign-in link → it arrives by email
-      (no more digging in logs); submit the marketing-site form → the lead
-      lands in your inbox with reply-to set to the submitter
+- [x] Resend account created ✓
+- [x] Domain verified ✓ — **`send.yufora.com`** (subdomain, deliberately:
+      isolates sending reputation from the root domain, which carries the
+      Google Workspace mailboxes)
+- [x] `RESEND_API_KEY` set in Vercel (Preview + Production) ✓
+- [x] `LEAD_NOTIFY_TO` = `william@yufora.com`,
+      `LEAD_NOTIFY_FROM` = `Yufora <hello@send.yufora.com>` ✓
+- [x] Verified on staging ✓ — sign-in email and lead-form submission both
+      accepted by Resend and delivered to william@yufora.com
+- Later (pre-launch): add `hello@yufora.com` as an alias/group in Google
+  Workspace so the site's public contact address actually receives mail
 
 ---
 
