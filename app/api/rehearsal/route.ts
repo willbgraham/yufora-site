@@ -281,7 +281,16 @@ export async function GET(req: NextRequest) {
           { limit: 10, types: ["checkout.session.completed", "charge.refunded"] },
           { stripeAccount: accountId },
         );
+        const endpoints = await stripe().webhookEndpoints.list({ limit: 10 });
         return Response.json({
+          endpoints: endpoints.data.map((w) => ({
+            id: w.id,
+            url: w.url.replace(/x-vercel-protection-bypass=[^&]+/, "bypass=…"),
+            status: w.status,
+            connect: (w as unknown as { connect?: boolean }).connect ?? null,
+            enabledEvents: w.enabled_events,
+            apiVersion: w.api_version,
+          })),
           sessions: sessions.data.map((s) => ({
             id: s.id.slice(0, 20) + "…",
             status: s.status,
