@@ -196,6 +196,37 @@ export async function GET(req: NextRequest) {
         });
       }
 
+      /* Complete a hosted checkout session's payment with Stripe's test
+         payment method (test mode only — skips only Stripe's own card UI). */
+      case "pay": {
+        const sessionId = req.nextUrl.searchParams.get("session");
+        const accountId = req.nextUrl.searchParams.get("account");
+        if (!sessionId || !accountId) {
+          return Response.json({ error: "session and account params required" }, { status: 400 });
+        }
+        const session = await stripe().checkout.sessions.retrieve(
+          sessionId,
+          {},
+          { stripeAccount: accountId },
+        );
+        const piId =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : session.payment_intent?.id;
+        if (!piId) {
+          return Response.json(
+            { error: "session has no payment intent yet", sessionStatus: session.status },
+            { status: 409 },
+          );
+        }
+        const pi = await stripe().paymentIntents.confirm(
+          piId,
+          { payment_method: "pm_card_visa" },
+          { stripeAccount: accountId },
+        );
+        return Response.json({ paymentIntent: pi.id, piStatus: pi.status });
+      }
+
       /* Refund the given payment intent on the connected account. */
       case "refund": {
         const pi = req.nextUrl.searchParams.get("pi");
