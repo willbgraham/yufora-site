@@ -241,6 +241,39 @@ export async function GET(req: NextRequest) {
         return Response.json({ refundId: refund.id, status: refund.status });
       }
 
+      /* Inspect, delete, and recreate our webhook endpoint as a Connect
+         endpoint; returns raw before/after objects for verification. */
+      case "fixhook": {
+        const oldId = req.nextUrl.searchParams.get("old");
+        const url = req.nextUrl.searchParams.get("url");
+        if (!oldId || !url) {
+          return Response.json({ error: "old and url params required" }, { status: 400 });
+        }
+        const before = await stripe().webhookEndpoints.retrieve(oldId);
+        await stripe().webhookEndpoints.del(oldId);
+        const created = await stripe().webhookEndpoints.create({
+          url,
+          connect: true,
+          enabled_events: [
+            "checkout.session.completed",
+            "charge.refunded",
+            "account.updated",
+          ],
+        });
+        return Response.json({ before, created });
+      }
+
+      /* Touch the connected account so account.updated fires — a live
+         end-to-end test of Connect event delivery. */
+      case "poke": {
+        const accountId = req.nextUrl.searchParams.get("account");
+        if (!accountId) return Response.json({ error: "account param required" }, { status: 400 });
+        await stripe().accounts.update(accountId, {
+          metadata: { rehearsalPoke: String(Math.floor(Date.now() / 1000)) },
+        });
+        return Response.json({ poked: accountId });
+      }
+
       /* Runtime env truth: which vars the deployment actually sees.
          Lengths and prefixes only — never values. */
       case "env": {
