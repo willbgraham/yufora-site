@@ -14,17 +14,15 @@ commit it).
 
 ### A1. Vercel project basics
 
-- [ ] Confirm the project exists at vercel.com and is linked to
-      `github.com/willbgraham/yufora-site` (if not: **Add New → Project → Import**)
-- [ ] Confirm `yufora.com` is attached under **Settings → Domains**
-      (production = `main` branch = the coming-soon page)
-- [ ] Confirm the `dev` branch produces preview deployments — under
-      **Deployments** you should see builds for `dev`. Your stable staging URL
-      looks like `https://yufora-site-git-dev-<your-scope>.vercel.app`
-- [ ] **Settings → Deployment Protection → Vercel Authentication → enabled for
-      Preview deployments.** Preview URLs are public by default — this step is
-      what makes staging private. Verify: open the staging URL in a private
-      browser window → it must demand a Vercel login.
+- [x] Confirm the project exists at vercel.com and is linked to
+      `github.com/willbgraham/yufora-site` ✓ (project `yufora-site`, CLI-linked)
+- [x] Confirm `yufora.com` is attached under **Settings → Domains**
+      ✓ (`yufora.com` + `www.yufora.com` verified; `www` is canonical)
+- [x] Confirm the `dev` branch produces preview deployments ✓ — staging URL:
+      `https://yufora-site-git-dev-willbgrahams-projects.vercel.app`
+- [x] **Deployment Protection** ✓ — Vercel Authentication active for all
+      non-custom-domain URLs; verified the staging URL demands login while
+      yufora.com stays public
 - [ ] Billing: Vercel's Hobby plan is for non-commercial use. Switch to
       **Pro** (~$20/mo) before real donations flow.
 
@@ -33,33 +31,23 @@ commit it).
 **Settings → Environment Variables.** Add for **Preview** (and Production where
 noted):
 
-- [ ] `BETTER_AUTH_SECRET` — any long random string. Generate one in your
-      terminal:
-
-      openssl rand -base64 32
-
-      Without it, sessions are signed with an insecure dev fallback.
-- [ ] `NEXT_PUBLIC_SITE_URL` — set to your **stable staging URL** for Preview
-      (e.g. `https://yufora-site-git-dev-<scope>.vercel.app`). Magic-link
-      emails, Stripe return URLs, and the embed snippet are all built from
-      this. At launch, the Production value becomes `https://yufora.com`.
+- [x] `BETTER_AUTH_SECRET` ✓ — generated and set for Production, Preview,
+      and Development
+- [x] `NEXT_PUBLIC_SITE_URL` ✓ — Preview = the staging URL; Production =
+      `https://www.yufora.com` (the canonical host)
 
 ### A3. Database (Neon Postgres)
 
-- [ ] Vercel → **Storage → Create Database → Neon (Postgres)**, free tier,
-      connect it to the project (all environments)
-- [ ] Check a `DATABASE_URL` env var now exists on the project. If the
-      integration named it something else (e.g. `POSTGRES_URL`), copy its
-      value into a new var named exactly `DATABASE_URL`.
-- [ ] Create the tables — from the repo, with the Neon URL:
-
-      DATABASE_URL="<paste the pooled connection string>" npm run db:push
-
-      (Or paste the URL to Claude and ask it to run the push.)
-- [ ] Verify: open `<staging-url>/signin`, request a link. With email not yet
-      configured the link is printed in the **Vercel function logs**
-      (Deployments → latest → Logs, look for `[auth] magic link`). Open the
-      logged URL → you should land in `/admin` and be able to create your shop.
+- [x] Neon database created and connected to yufora-site ✓
+- [x] `DATABASE_URL` exists on the project ✓ (plus Neon's extra aliases,
+      which are harmless)
+- [x] Tables created on Neon ✓ — all 8 (auth ×4 + charities, products,
+      product_photos, contributions)
+- [x] Verified end-to-end on staging ✓ — magic link requested, followed,
+      session created, `/admin` onboarding rendered
+- Note: the Neon integration uses **preview branching** — preview
+  deployments get an isolated branch of the database; production uses the
+  main branch. Staging data therefore can't pollute production.
 
 ### A4. Photo storage (Vercel Blob)
 
