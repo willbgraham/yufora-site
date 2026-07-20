@@ -83,15 +83,16 @@ noted):
 
 ### C1. Platform account
 
-- [ ] Create a free account at **stripe.com** (this is *Yufora's* platform
-      account — it never holds donation money, but Stripe requires the
-      platform to be registered)
-- [ ] Enable Connect: Dashboard → **Connect → Get started** → choose
-      **Platform or marketplace**
-- [ ] Stay in **Test mode** (toggle top-right) for everything below
-- [ ] **Developers → API keys** → copy the test **Secret key** (`sk_test_…`)
-- [ ] Add env var `STRIPE_SECRET_KEY` = the `sk_test_…` key (Preview; and
-      `.env.local` for local testing)
+- [x] Stripe account ✓ (existing account reused — note it also carries old
+      webhook endpoints from a previous Bubble.io project)
+- [x] Connect enabled ✓ (platform/marketplace)
+- [x] Test-mode `STRIPE_SECRET_KEY` in Vercel (Preview + Production, stored
+      as Sensitive — write-only, which is fine) ✓
+
+> **Hard-won lesson:** create webhook endpoints AFTER enabling Connect.
+> An endpoint created before Connect exists silently ignores the
+> `connect: true` flag and never receives connected-account events — no
+> errors, no retries, nothing. This bit us; the endpoint was rebuilt.
 
 ### C2. Webhooks — local testing (the simple path)
 
@@ -127,25 +128,29 @@ When creating a dashboard webhook endpoint (launch, or the bypass URL above):
 
 ---
 
-## Part D — The full test-mode rehearsal
+## Part D — The full test-mode rehearsal ✅ COMPLETED on staging (2026-07-20)
 
-With A–C done, run the whole loop as if you were a charity, locally
-(`npm run dev` + `stripe listen` both running):
+Run against the deployed staging environment with a live Connect webhook
+(bypass-param URL), not the local `stripe listen` route:
 
-- [ ] Sign in at `/signin` → create your shop
-- [ ] Add a product with photos and a price → **Publish**
-- [ ] Dashboard → **Connect Stripe** → Stripe's test-mode onboarding accepts
-      fictional details (use the "use test data" prompts; phone
-      `000-000-0000`, etc.) → land back on "Stripe is connected"
-- [ ] Open your shop page → the product → **Fund this** (or Chip in)
-- [ ] Pay with Stripe's test card: `4242 4242 4242 4242`, any future expiry,
-      any CVC, any ZIP
-- [ ] You're returned to the item with a thank-you banner
-- [ ] The progress bar updates within a few seconds (webhook via `stripe listen`)
-- [ ] Admin → **Contributions** shows the gift; **Download CSV** works
-- [ ] Donor confirmation email arrives (or is logged if Resend isn't set up)
-- [ ] Embed test: paste the snippet from the dashboard into any test page —
-      the shop renders inside it and resizes itself
+- [x] Test connected account provisioned, charges enabled ✓
+- [x] Shop seeded: charity + published product ✓
+- [x] Real donation: William paid $1,500 with the `4242` test card on
+      Stripe's hosted page — which showed the CHARITY's name (merchant of
+      record working as designed) ✓
+- [x] `checkout.session.completed` webhook → contribution recorded, progress
+      bar → "Fully funded" on the public page ✓
+- [x] Donor confirmation email (fully-funded "You finished it" variant)
+      delivered via Resend ✓
+- [x] Refund test: `charge.refunded` webhook → contribution marked refunded,
+      progress rolled back to $0 ✓
+- [x] Embed verified earlier on a separate-origin test page (auto-resizing
+      iframe, in-iframe navigation) ✓
+- Remaining, non-blocking: click through the real **Connect Stripe**
+  onboarding from the admin dashboard once, as a charity would (the
+  rehearsal provisioned its test account via API)
+- Note: one earlier $1,500 test payment predates the webhook fix and was
+  never recorded — refund or ignore it in the Stripe test dashboard
 
 ---
 
