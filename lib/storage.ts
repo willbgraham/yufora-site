@@ -4,11 +4,19 @@ import path from "node:path";
 
 /**
  * Photo storage with the same fallback principle as email/db:
- * - BLOB_READ_WRITE_TOKEN set → Vercel Blob (production)
- * - otherwise, local dev      → files under .uploads/, served by
- *                               /api/uploads/[...path]
- * - otherwise, production     → clear error
+ * - Vercel Blob configured → Blob (production). Two auth styles exist:
+ *   classic BLOB_READ_WRITE_TOKEN, or the newer OIDC flow where the store
+ *   connection injects BLOB_STORE_ID and the SDK exchanges the deployment's
+ *   identity token automatically. Either counts as configured.
+ * - otherwise, local dev   → files under .uploads/, served by
+ *                            /api/uploads/[...path]
+ * - otherwise, production  → clear error
  */
+function blobConfigured(): boolean {
+  return Boolean(
+    process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID,
+  );
+}
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -39,7 +47,7 @@ export async function savePhoto(
 
   const name = `${crypto.randomUUID()}.${ext}`;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  if (blobConfigured()) {
     const { put } = await import("@vercel/blob");
     const blob = await put(`products/${productId}/${name}`, file, {
       access: "public",
@@ -50,7 +58,7 @@ export async function savePhoto(
 
   if (process.env.NODE_ENV === "production") {
     throw new Error(
-      "BLOB_READ_WRITE_TOKEN is not set — create a Blob store in Vercel (Storage → Blob) to enable photo uploads.",
+      "Blob storage is not configured — connect a Blob store in Vercel (Storage → Blob) to enable photo uploads.",
     );
   }
 
@@ -78,7 +86,7 @@ export async function deletePhotoBlob(url: string): Promise<void> {
       await unlink(target);
       return;
     }
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
+    if (blobConfigured()) {
       const { del } = await import("@vercel/blob");
       await del(url);
     }
