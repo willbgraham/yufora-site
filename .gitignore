@@ -11,6 +11,9 @@
 # local embedded database (dev only)
 /.pglite/
 
+# local photo uploads (dev only)
+/.uploads/
+
 # misc
 .DS_Store
 *.pem
