@@ -92,6 +92,14 @@ export const charities = pgTable(
       .references(() => user.id),
     /** Connected Stripe account (acct_...) once Stripe onboarding completes. */
     stripeAccountId: text("stripe_account_id"),
+    /**
+     * Cached from Stripe's charges_enabled — updated on onboarding return and
+     * via the account.updated webhook. Gates public checkout without a
+     * Stripe API call per page view.
+     */
+    stripeChargesEnabled: boolean("stripe_charges_enabled")
+      .notNull()
+      .default(false),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()

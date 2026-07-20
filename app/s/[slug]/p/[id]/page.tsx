@@ -5,11 +5,16 @@ import { notFound } from "next/navigation";
 import Container from "@/components/layout/Container";
 import ProgressBar from "@/components/ui/ProgressBar";
 import { Button } from "@/components/ui/Button";
+import FundButtons from "@/components/shop/FundButtons";
 import { getPublicProduct } from "@/lib/data/products";
 import { formatCents } from "@/lib/money";
+import { isStripeConfigured } from "@/lib/stripe";
 import { parseVideoUrl } from "@/lib/video";
 
-type Props = { params: Promise<{ slug: string; id: string }> };
+type Props = {
+  params: Promise<{ slug: string; id: string }>;
+  searchParams: Promise<{ donated?: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, id } = await params;
@@ -21,8 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PublicProductPage({ params }: Props) {
+export default async function PublicProductPage({ params, searchParams }: Props) {
   const { slug, id } = await params;
+  const { donated } = await searchParams;
   const data = await getPublicProduct(slug, id);
   if (!data) notFound();
 
@@ -30,6 +36,10 @@ export default async function PublicProductPage({ params }: Props) {
   const video = product.videoUrl ? parseVideoUrl(product.videoUrl) : null;
   const funded = product.fundedCents >= product.goalCents;
   const remaining = Math.max(0, product.goalCents - product.fundedCents);
+  const donationsOpen =
+    isStripeConfigured() &&
+    Boolean(charity.stripeAccountId) &&
+    charity.stripeChargesEnabled;
 
   return (
     <Container className="py-12">
@@ -105,14 +115,28 @@ export default async function PublicProductPage({ params }: Props) {
             />
           </div>
 
+          {donated === "1" && (
+            <div
+              role="status"
+              className="mt-6 rounded-lg border border-teal-100 bg-teal-50 p-4 text-teal-900"
+            >
+              <p className="font-medium">Thank you!</p>
+              <p className="mt-1 text-sm">
+                Your donation is processing — the progress bar updates in a
+                moment, and your receipt is on its way by email.
+              </p>
+            </div>
+          )}
+
           <div className="mt-6 space-y-3">
             {funded ? (
               <p className="rounded-lg bg-teal-50 p-4 text-teal-900">
                 This item is fully funded. Thank you!
               </p>
+            ) : donationsOpen ? (
+              <FundButtons productId={product.id} remainingCents={remaining} />
             ) : (
               <>
-                {/* Wired to Stripe Checkout in the next phase. */}
                 <Button size="lg" className="w-full" disabled>
                   Fund this — {formatCents(remaining)}
                 </Button>
