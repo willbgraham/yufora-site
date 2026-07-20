@@ -268,6 +268,36 @@ export async function GET(req: NextRequest) {
         return Response.json(report);
       }
 
+      /* Stripe-side truth: recent checkout sessions + events on the
+         connected account, with pending webhook-retry counts. */
+      case "events": {
+        const accountId = req.nextUrl.searchParams.get("account");
+        if (!accountId) return Response.json({ error: "account param required" }, { status: 400 });
+        const sessions = await stripe().checkout.sessions.list(
+          { limit: 5 },
+          { stripeAccount: accountId },
+        );
+        const events = await stripe().events.list(
+          { limit: 10, types: ["checkout.session.completed", "charge.refunded"] },
+          { stripeAccount: accountId },
+        );
+        return Response.json({
+          sessions: sessions.data.map((s) => ({
+            id: s.id.slice(0, 20) + "…",
+            status: s.status,
+            paymentStatus: s.payment_status,
+            amount: s.amount_total,
+            created: new Date(s.created * 1000).toISOString(),
+            metadata: s.metadata,
+          })),
+          events: events.data.map((e) => ({
+            type: e.type,
+            created: new Date(e.created * 1000).toISOString(),
+            pendingWebhooks: e.pending_webhooks,
+          })),
+        });
+      }
+
       default:
         return Response.json({ error: "unknown action" }, { status: 400 });
     }
