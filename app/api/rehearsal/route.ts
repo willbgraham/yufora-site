@@ -241,6 +241,33 @@ export async function GET(req: NextRequest) {
         return Response.json({ refundId: refund.id, status: refund.status });
       }
 
+      /* Runtime env truth: which vars the deployment actually sees.
+         Lengths and prefixes only — never values. */
+      case "env": {
+        const keys = [
+          "STRIPE_SECRET_KEY",
+          "STRIPE_WEBHOOK_SECRET",
+          "BETTER_AUTH_SECRET",
+          "NEXT_PUBLIC_SITE_URL",
+          "LEAD_NOTIFY_TO",
+          "LEAD_NOTIFY_FROM",
+          "RESEND_API_KEY",
+          "DATABASE_URL",
+          "BLOB_STORE_ID",
+        ];
+        const report: Record<string, string> = {};
+        for (const k of keys) {
+          const v = process.env[k];
+          report[k] =
+            v === undefined
+              ? "UNDEFINED"
+              : v === ""
+                ? "EMPTY STRING"
+                : `set (len ${v.length}, ${v.slice(0, 4)}…)`;
+        }
+        return Response.json(report);
+      }
+
       default:
         return Response.json({ error: "unknown action" }, { status: 400 });
     }
