@@ -45,15 +45,21 @@ noted):
       product_photos, contributions)
 - [x] Verified end-to-end on staging ✓ — magic link requested, followed,
       session created, `/admin` onboarding rendered
-- Note: the Neon integration uses **preview branching** — preview
-  deployments get an isolated branch of the database; production uses the
-  main branch. Staging data therefore can't pollute production.
+- Note: the Neon integration creates **a fresh database branch per preview
+  deployment** (verified). Upside: staging experiments can never pollute
+  production. Downside: **staging test data resets on every push to dev** —
+  any test shop/products you create on staging disappear at the next
+  deployment. If that gets annoying while testing, change it in Vercel →
+  Storage → the Neon store → Settings (deployments/branching configuration)
+  to reuse one branch for previews. Production always uses the main branch.
 
 ### A4. Photo storage (Vercel Blob)
 
-- [ ] Vercel → **Storage → Create → Blob**, connect to the project —
-      `BLOB_READ_WRITE_TOKEN` is added automatically
-- [ ] Redeploy, then verify: admin → Products → add a product → upload a photo
+- [x] Blob store `yufora-site-blob` created and connected ✓ (production +
+      preview). Note: new-style connections use OIDC auth (`BLOB_STORE_ID`),
+      not the classic `BLOB_READ_WRITE_TOKEN` — the app supports both.
+- [x] Verified on staging ✓ — upload → public fetch → delete round-trip
+      succeeded on the deployed preview
 
 ---
 
