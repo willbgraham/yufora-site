@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Section from "@/components/layout/Section";
 import Steps from "@/components/marketing/Steps";
 import Eyebrow from "@/components/marketing/Eyebrow";
@@ -15,27 +16,39 @@ export default function FilmsPage() {
   return (
     <>
       <Section tone="dark">
-        <div className="max-w-3xl">
-          <Eyebrow>Yufora Films</Eyebrow>
-          <h1 className="text-[length:var(--text-display)] leading-[1.08] text-white">
-            The story behind your latest impact.
-          </h1>
-          <p className="mt-6 text-xl text-warm-300">
-            Our film team spends a day or two with you and makes a short
-            documentary about the work you actually did this year — the people,
-            the place, the difference. Then it goes at the top of your campaign.
-          </p>
-          <p className="mt-6 font-display text-2xl text-white">
-            A tool asks. A story is why they answer.
-          </p>
-          <ButtonLink
-            href={CTA_HREF}
-            size="lg"
-            variant="secondary"
-            className="mt-8"
-          >
-            Talk to us about a film
-          </ButtonLink>
+        <div className="grid items-center gap-10 lg:grid-cols-[3fr_2fr]">
+          <div>
+            <Eyebrow>Yufora Films</Eyebrow>
+            <h1 className="text-[length:var(--text-display)] leading-[1.08] text-white">
+              The story behind your latest impact.
+            </h1>
+            <p className="mt-6 text-xl text-warm-300">
+              Our film team spends a day or two with you and makes a short
+              documentary about the work you actually did this year — the
+              people, the place, the difference. Then it goes at the top of
+              your campaign.
+            </p>
+            <p className="mt-6 font-display text-2xl text-white">
+              A tool asks. A story is why they answer.
+            </p>
+            <ButtonLink
+              href={CTA_HREF}
+              size="lg"
+              variant="secondary"
+              className="mt-8"
+            >
+              Talk to us about a film
+            </ButtonLink>
+          </div>
+          <Image
+            src="/films-hero.jpg"
+            alt="Filming on location — trading high-fives with kids between takes"
+            width={1000}
+            height={1569}
+            priority
+            sizes="(min-width: 1024px) 400px, 90vw"
+            className="mx-auto w-full max-w-sm rounded-xl ring-1 ring-white/10 lg:max-w-none"
+          />
         </div>
       </Section>
 
