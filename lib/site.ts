@@ -21,3 +21,9 @@ export const navLinks = [
  */
 export const CTA_LABEL = "Get started";
 export const CTA_HREF = "/start";
+
+/**
+ * Scheduling link (Cal.com/Calendly). When set, the /start page offers
+ * "book 20 minutes" alongside the form; until then it falls back to email.
+ */
+export const BOOK_CALL_URL: string | null = null;

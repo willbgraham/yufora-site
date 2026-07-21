@@ -129,6 +129,16 @@ export default function Home() {
             ]}
           />
         </div>
+        <div className="mt-12 rounded-xl border border-pink-100 bg-pink-50 px-6 py-8 sm:px-10">
+          <p className="font-display text-2xl text-warm-900">
+            And you&rsquo;re never alone with the software.
+          </p>
+          <p className="mt-2 max-w-2xl text-warm-700">
+            Most platforms leave you with a help center. Every Yufora account
+            comes with a human — a real person who set your shop up, knows your
+            organization, and answers when you write.
+          </p>
+        </div>
       </Section>
 
       {/* 5 — Where the money goes */}
@@ -167,8 +177,8 @@ export default function Home() {
         <SectionHeading
           id="contests-heading"
           eyebrow="Contests"
-          title="Run a photo contest your supporters actually share."
-          lead="Skill-judged competitions — creativity, technique, relevance to a theme — run on your own site. The part most organizations get wrong is the legal setup, so we build it in."
+          title="Run a photo contest that grows your donor list."
+          lead="Skill-judged competitions — creativity, technique, relevance to a theme — run on your own site. Every entrant joins a list you keep, and the legal setup most organizations get wrong is built in."
         />
         <div className="mt-10">
           <FeatureList
@@ -183,7 +193,7 @@ export default function Home() {
               },
               {
                 title: "Entries collected on your site",
-                body: "Supporters upload directly, with consent and content rights captured up front.",
+                body: "Supporters upload directly — every entry adds a name and email to your supporter list, with consent and content rights captured up front.",
               },
               {
                 title: "Instagram hashtag entries",

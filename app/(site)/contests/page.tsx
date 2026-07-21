@@ -20,12 +20,12 @@ export default function ContestsPage() {
         <div className="max-w-3xl">
           <Eyebrow>Contests</Eyebrow>
           <h1 className="text-[length:var(--text-display)] leading-[1.08]">
-            Photo contests that bring new people to your cause.
+            Photo contests that grow your donor list.
           </h1>
           <p className="mt-6 text-xl text-warm-700">
-            A skill-judged contest gets your supporters creating and sharing —
-            and brings their friends to your website. We handle the part most
-            organizations get wrong: the rules and the judging.
+            A skill-judged contest gets supporters creating and sharing — and
+            every person it touches joins a list you keep. We handle the part
+            most organizations get wrong: the rules and the judging.
           </p>
           <ButtonLink href={CTA_HREF} size="lg" className="mt-8">
             {CTA_LABEL}
@@ -63,7 +63,38 @@ export default function ContestsPage() {
         </div>
       </Section>
 
-      <Section tone="tint" labelledBy="c-ig">
+      <Section tone="tint" labelledBy="c-list">
+        <SectionHeading
+          id="c-list"
+          eyebrow="The real prize is your list"
+          title="Every entry is a supporter you keep."
+          lead="A contest isn't just a moment of attention — it's the fastest honest way to grow your email list."
+        />
+        <div className="mt-10">
+          <FeatureList
+            items={[
+              {
+                title: "Entrants join your list",
+                body: "Every submission captures a name, an email, and permission to stay in touch — people invested enough to make something for you.",
+              },
+              {
+                title: "Their friends follow",
+                body: "Entrants share their own work. The people who come to see it land on your site, not a social feed.",
+              },
+              {
+                title: "The content is yours too",
+                body: "Rights are captured at entry — winning photos become your campaign assets, with real people in them.",
+              },
+              {
+                title: "It feeds everything else",
+                body: "A bigger list makes every appeal, every wishlist item, and every email we send for you work harder.",
+              },
+            ]}
+          />
+        </div>
+      </Section>
+
+      <Section labelledBy="c-ig">
         <SectionHeading
           id="c-ig"
           eyebrow="Coming later"
@@ -72,7 +103,7 @@ export default function ContestsPage() {
         />
       </Section>
 
-      <Section>
+      <Section tone="tint">
         <CTABand
           title="Have a contest idea?"
           body="Tell us the theme and the prize. We'll come back with how the rules and judging would work."
