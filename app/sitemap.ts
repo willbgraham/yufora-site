@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/shop",
     "/contests",
     "/films",
+    "/services",
     "/about",
     "/request-access",
     "/privacy",

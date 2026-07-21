@@ -93,10 +93,41 @@ export default function ShopPage() {
         </div>
       </Section>
 
-      <Section tone="tint">
+      <Section tone="tint" id="done-for-you" labelledBy="dfy-heading">
+        <SectionHeading
+          id="dfy-heading"
+          eyebrow="The done-for-you alternative"
+          title="Or don't run it yourself at all."
+          lead="The wishlist shop is built for organizations that want to run their own. If nobody on your team has the time, we'll do the whole thing as a service."
+        />
+        <div className="mt-10">
+          <FeatureList
+            items={[
+              {
+                title: "Full setup",
+                body: "We build the shop, load your items, write the descriptions, and get the embed live on your website.",
+              },
+              {
+                title: "Ongoing management",
+                body: "New items added, funded ones celebrated and retired, photos kept fresh — you approve, we do.",
+              },
+              {
+                title: "A full store, if you sell things too",
+                body: "T-shirts, calendars, event tickets — we set up and manage real merchandise e-commerce alongside the wishlist.",
+              },
+              {
+                title: "Your money, still yours",
+                body: "Managed doesn't mean middleman: donations and sales still settle directly to your own accounts.",
+              },
+            ]}
+          />
+        </div>
+      </Section>
+
+      <Section>
         <CTABand
           title="Want to see it with your own wishlist?"
-          body="Tell us the five things you'd put on it first. We'll show you how the shop would look on your site."
+          body="Tell us the five things you'd put on it first — or tell us to do the whole thing for you. Either way, we'll show you how it would look on your site."
         />
       </Section>
     </>

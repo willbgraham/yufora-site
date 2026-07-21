@@ -10,8 +10,12 @@ export const ROLES = [
 
 export const INTERESTS = [
   { value: "shop", label: "Wishlist shop" },
+  { value: "managed-store", label: "Done-for-you shop / store" },
   { value: "contests", label: "Contests" },
   { value: "films", label: "A documentary film" },
+  { value: "content-packs", label: "Content packs" },
+  { value: "ad-grants", label: "Google Ad Grants management" },
+  { value: "email-marketing", label: "Email marketing" },
   { value: "unsure", label: "Not sure yet" },
 ] as const;
 

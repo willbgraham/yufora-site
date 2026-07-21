@@ -76,7 +76,41 @@ export default function FilmsPage() {
         </div>
       </Section>
 
-      <Section tone="tint">
+      <Section tone="tint" id="content-packs" labelledBy="packs-heading">
+        <div className="grid gap-10 lg:grid-cols-2">
+          <div>
+            <h2 id="packs-heading" className="text-3xl sm:text-4xl">
+              One day of filming.
+              <br />A year of content.
+            </h2>
+            <p className="mt-4 text-lg text-warm-700">
+              The documentary is the centerpiece — the content pack is
+              everything else your footage can become. One shoot keeps your
+              channels fed for months, at a fraction of the cost of filming
+              again.
+            </p>
+          </div>
+          <ul className="space-y-3 self-center">
+            {[
+              ["30-second cuts", "for Instagram, TikTok, and Reels — sized and captioned for each"],
+              ["Email headers and loops", "short motion pieces that make appeals feel alive"],
+              ["A gala opener", "the two minutes that quiets the room before the ask"],
+              ["Quote cards and stills", "pull-quotes and frames, designed for sharing"],
+              ["Campaign re-cuts", "the same story, re-edited around your next appeal"],
+            ].map(([title, body]) => (
+              <li
+                key={title}
+                className="rounded-lg border border-warm-200 bg-white px-5 py-3.5"
+              >
+                <span className="font-medium text-warm-900">{title}</span>{" "}
+                <span className="text-warm-700">— {body}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+
+      <Section>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-2xl sm:text-3xl">
             Pairs with the shop and contests

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Section from "@/components/layout/Section";
 import { ButtonLink } from "@/components/ui/Button";
 import Eyebrow from "@/components/marketing/Eyebrow";
@@ -223,6 +224,57 @@ export default function Home() {
         </div>
       </Section>
 
+      {/* 7b — Done-for-you services */}
+      <Section tone="tint" labelledBy="services-heading">
+        <SectionHeading
+          id="services-heading"
+          eyebrow="Services"
+          title="Rather have it done for you?"
+          lead="The tools are for teams that want control. For everyone else, we do the work — starting now, no software required."
+        />
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <Link
+            href="/services#adgrants-heading"
+            className="rounded-xl border border-warm-200 bg-white p-6 transition-shadow hover:shadow-md"
+          >
+            <h3 className="text-lg text-warm-900">Google Ad Grants</h3>
+            <p className="mt-1.5 text-sm text-warm-700">
+              $10,000/month in free Google ads — most nonprofits leave it
+              unclaimed or get suspended on a technicality. We run it right.
+            </p>
+          </Link>
+          <Link
+            href="/services#email-heading"
+            className="rounded-xl border border-warm-200 bg-white p-6 transition-shadow hover:shadow-md"
+          >
+            <h3 className="text-lg text-warm-900">Email marketing</h3>
+            <p className="mt-1.5 text-sm text-warm-700">
+              Welcome series, stewardship, year-end appeals — the second email
+              most donors never get.
+            </p>
+          </Link>
+          <Link
+            href="/films#content-packs"
+            className="rounded-xl border border-warm-200 bg-white p-6 transition-shadow hover:shadow-md"
+          >
+            <h3 className="text-lg text-warm-900">Content packs</h3>
+            <p className="mt-1.5 text-sm text-warm-700">
+              One day of filming, a year of content — cutdowns and assets from
+              your documentary.
+            </p>
+          </Link>
+        </div>
+        <p className="mt-6 text-sm text-warm-600">
+          <Link href="/services" className="text-pink-700 hover:underline">
+            All services →
+          </Link>{" "}
+          Prefer the shop handled too?{" "}
+          <Link href="/shop#done-for-you" className="text-pink-700 hover:underline">
+            Full e-commerce, set up and managed.
+          </Link>
+        </p>
+      </Section>
+
       {/* 8 — Honest status */}
       <Section labelledBy="status-heading">
         <div className="grid gap-10 md:grid-cols-2">
@@ -235,7 +287,7 @@ export default function Home() {
             {[
               "The wishlist shop is in build. First campaigns run this season.",
               "Contests follow shortly after.",
-              "The film team is working now — that one you can book today.",
+              "The services — films, content packs, Ad Grants, email — are live now. Those you can book today.",
             ].map((s) => (
               <li
                 key={s}
@@ -289,7 +341,11 @@ export default function Home() {
               },
               {
                 q: "When can we start?",
-                a: "The film service is available now. The shop and contests are onboarding a first group of nonprofits — request early access and we'll tell you the timeline honestly.",
+                a: "The services — films, content packs, Ad Grants management, email marketing — are available now. The shop and contests are onboarding a first group of nonprofits; request early access and we'll tell you the timeline honestly.",
+              },
+              {
+                q: "Can you just run everything for us?",
+                a: "Yes. Every tool has a done-for-you version: we set up and manage the shop (or a full merchandise store), run your email, and manage your Ad Grant. You approve; we do the work.",
               },
               {
                 q: "What does it cost?",
