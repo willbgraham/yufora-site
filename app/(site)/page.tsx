@@ -289,7 +289,7 @@ export default function Home() {
           title="Rather have it done for you?"
           lead="The tools are for teams that want control. For everyone else, we do the work — starting now, no software required."
         />
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Link
             href="/services#adgrants-heading"
             className="rounded-xl border border-warm-200 bg-white p-6 transition-shadow hover:shadow-md"
@@ -318,6 +318,16 @@ export default function Home() {
             <p className="mt-1.5 text-sm text-warm-700">
               One day of filming, a year of content — cutdowns and assets from
               your documentary.
+            </p>
+          </Link>
+          <Link
+            href="/services#design-heading"
+            className="rounded-xl border border-warm-200 bg-white p-6 transition-shadow hover:shadow-md"
+          >
+            <h3 className="text-lg text-warm-900">Design Studio</h3>
+            <p className="mt-1.5 text-sm text-warm-700">
+              Graphics, posters, and merch — with print-on-demand wired to
+              your site, no inventory ever.
             </p>
           </Link>
         </div>

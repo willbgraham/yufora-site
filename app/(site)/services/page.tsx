@@ -95,7 +95,38 @@ export default function ServicesPage() {
         </div>
       </Section>
 
-      <Section labelledBy="more-heading">
+      <Section labelledBy="design-heading">
+        <SectionHeading
+          id="design-heading"
+          eyebrow="Design Studio"
+          title="Graphics, posters, and merch your supporters actually want."
+          lead="Campaign visuals that look like they cost more than they did — and merchandise without a single box in anyone's garage."
+        />
+        <div className="mt-10">
+          <FeatureList
+            items={[
+              {
+                title: "Campaign graphics and posters",
+                body: "Appeal visuals, event posters, social assets, banners — designed to your brand, sized for wherever they're going.",
+              },
+              {
+                title: "Merch, designed for you",
+                body: "T-shirts, totes, mugs, calendars — designs your supporters will actually wear, not just tolerate.",
+              },
+              {
+                title: "Print-on-demand, wired to your site",
+                body: "We connect Printify or Printful to your website: each item is printed and shipped when someone orders it. No inventory, no minimums, no money tied up in boxes.",
+              },
+              {
+                title: "Hassle-free from day one",
+                body: "We set up the store, load the designs, and hand you the keys — sales run themselves.",
+              },
+            ]}
+          />
+        </div>
+      </Section>
+
+      <Section tone="tint" labelledBy="more-heading">
         <SectionHeading
           id="more-heading"
           title="Also done for you"
@@ -127,7 +158,7 @@ export default function ServicesPage() {
         </div>
       </Section>
 
-      <Section tone="tint">
+      <Section>
         <CTABand
           title="Tell us what needs doing."
           body="Services start now — no waiting for software. Tell us what you're planning and we'll come back with a straight answer on scope and price."
