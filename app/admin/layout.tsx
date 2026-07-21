@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Container from "@/components/layout/Container";
 import SignOutButton from "@/components/admin/SignOutButton";
-import { requireSession } from "@/lib/session";
+import { requireSession, isStaffEmail } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -16,6 +16,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await requireSession();
+  const staff = isStaffEmail(session.user.email);
 
   return (
     <div className="flex min-h-screen flex-col bg-warm-50">
@@ -44,6 +45,14 @@ export default async function AdminLayout({
             </span>
           </Link>
           <div className="flex items-center gap-2">
+            {staff && (
+              <Link
+                href="/admin/news"
+                className="rounded-md px-3 py-2 text-sm font-medium text-warm-700 hover:bg-warm-50 hover:text-pink-700"
+              >
+                Newsroom
+              </Link>
+            )}
             <span className="hidden text-sm text-warm-600 sm:block">
               {session.user.email}
             </span>

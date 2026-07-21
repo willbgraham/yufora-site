@@ -224,3 +224,32 @@ export const contributions = pgTable(
     index("contributions_charity_idx").on(t.charityId),
   ],
 );
+
+/* ---------------------------------------------------------------------------
+   Newsroom — Yufora-wide, first-party editorial content. Deliberately NOT
+   charity-scoped: one global newsroom curated by staff (see requireStaff()).
+--------------------------------------------------------------------------- */
+
+/** Original articles written by Yufora staff. Reuses ProductStatus vocabulary
+ *  (draft = not visible, published = live, archived = hidden but kept). */
+export const articles = pgTable(
+  "articles",
+  {
+    id: id(),
+    title: text("title").notNull(),
+    slug: text("slug").notNull().unique(),
+    excerpt: text("excerpt").notNull().default(""),
+    /** Markdown, rendered with react-markdown (safe by default). */
+    body: text("body").notNull().default(""),
+    coverImageUrl: text("cover_image_url"),
+    author: text("author").notNull().default("Yufora"),
+    status: text("status").$type<ProductStatus>().notNull().default("draft"),
+    publishedAt: timestamp("published_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [index("articles_status_idx").on(t.status, t.publishedAt)],
+);

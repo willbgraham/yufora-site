@@ -45,6 +45,7 @@ export const navGroups: NavEntry[] = [
       },
     ],
   },
+  { href: "/news", label: "News" },
   { href: "/about", label: "About" },
 ];
 
