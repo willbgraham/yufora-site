@@ -7,14 +7,51 @@ export const siteConfig = {
   email: "hello@yufora.com",
 } as const;
 
-export const navLinks = [
-  { href: "/shop", label: "Shop" },
-  { href: "/donor-wall", label: "Donor wall" },
-  { href: "/contests", label: "Contests" },
-  { href: "/films", label: "Films" },
-  { href: "/services", label: "Services" },
+export type NavItem = { href: string; label: string; desc?: string };
+export type NavEntry = NavItem | { label: string; items: NavItem[] };
+
+/**
+ * Header navigation. Grouped to mirror the brand split the whole site is
+ * built on: Products are self-serve tools the charity runs; Services are
+ * done-for-you work. Keeping that distinction in the nav reinforces it.
+ */
+export const navGroups: NavEntry[] = [
+  {
+    label: "Products",
+    items: [
+      { href: "/shop", label: "Wishlist shop", desc: "Fund the things you need" },
+      { href: "/donor-wall", label: "Donor wall", desc: "Live giving on your site" },
+      { href: "/contests", label: "Contests", desc: "Grow your donor list" },
+    ],
+  },
+  {
+    label: "Services",
+    items: [
+      { href: "/films", label: "Films", desc: "Documentaries & content packs" },
+      {
+        href: "/services#adgrants-heading",
+        label: "Google Ad Grants",
+        desc: "$10k/mo in free ads, managed",
+      },
+      {
+        href: "/services#email-heading",
+        label: "Email marketing",
+        desc: "Welcome, stewardship, appeals",
+      },
+      {
+        href: "/services#design-heading",
+        label: "Design Studio",
+        desc: "Graphics, posters & merch",
+      },
+    ],
+  },
   { href: "/about", label: "About" },
-] as const;
+];
+
+/** Flat list for the footer. */
+export const footerLinks: NavItem[] = navGroups.flatMap((entry) =>
+  "items" in entry ? entry.items : [entry],
+);
 
 /**
  * Single CTA wording across the whole site. Services are bookable today and

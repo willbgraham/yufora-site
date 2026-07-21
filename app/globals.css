@@ -69,6 +69,9 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    /* Anchor jumps (nav dropdown links to #sections) clear the 4rem sticky
+       header instead of landing underneath it. */
+    scroll-padding-top: 5rem;
   }
 
   body {

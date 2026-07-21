@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Container from "./Container";
-import { navLinks, siteConfig } from "@/lib/site";
+import { footerLinks, siteConfig } from "@/lib/site";
 
 export default function SiteFooter() {
   return (
@@ -14,8 +14,8 @@ export default function SiteFooter() {
             </p>
           </div>
 
-          <nav aria-label="Footer" className="flex flex-col gap-2 text-sm">
-            {navLinks.map((link) => (
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            {footerLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -24,10 +24,7 @@ export default function SiteFooter() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/start"
-              className="text-warm-700 hover:text-pink-700"
-            >
+            <Link href="/start" className="text-warm-700 hover:text-pink-700">
               Get started
             </Link>
           </nav>
