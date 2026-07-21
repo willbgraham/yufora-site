@@ -29,7 +29,7 @@ export default function StartPage() {
               rel="noopener"
               className="text-pink-700 hover:underline"
             >
-              Book 20 minutes with us
+              Book 30 minutes with us
             </a>
           ) : (
             <a

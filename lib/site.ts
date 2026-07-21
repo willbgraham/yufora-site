@@ -26,4 +26,5 @@ export const CTA_HREF = "/start";
  * Scheduling link (Cal.com/Calendly). When set, the /start page offers
  * "book 20 minutes" alongside the form; until then it falls back to email.
  */
-export const BOOK_CALL_URL: string | null = null;
+export const BOOK_CALL_URL: string | null =
+  "https://calendly.com/yufora-meeting/30min";
