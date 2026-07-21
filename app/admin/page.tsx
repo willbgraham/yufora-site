@@ -74,6 +74,13 @@ export default async function AdminPage() {
             >
               yufora.com/s/{charity.slug}
             </Link>
+            {" · "}
+            <Link
+              href="/admin/wall"
+              className="text-pink-700 hover:underline"
+            >
+              Donor wall
+            </Link>
           </p>
         </div>
         {totals.count > 0 && (

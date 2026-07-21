@@ -35,6 +35,8 @@
     if (script.getAttribute("data-mode") === "top") {
       src += "?mode=top";
     }
+  } else if (widget === "ticker") {
+    src += "/ticker";
   } else {
     // If the donor was just sent back from checkout, the charity's page URL
     // carries yufora_item / yufora_thanks — open the iframe straight to that
@@ -55,11 +57,13 @@
 
   var iframe = document.createElement("iframe");
   iframe.src = src;
-  iframe.title = widget === "wall" ? "Supporter wall" : "Wishlist shop";
+  iframe.title =
+    widget === "wall" || widget === "ticker" ? "Supporter wall" : "Wishlist shop";
   iframe.style.display = "block";
   iframe.style.width = "100%";
   iframe.style.border = "0";
-  iframe.style.height = widget === "wall" ? "320px" : "600px";
+  iframe.style.height =
+    widget === "wall" || widget === "ticker" ? "320px" : "600px";
   iframe.setAttribute("loading", "lazy");
 
   script.parentNode.insertBefore(iframe, script.nextSibling);

@@ -106,6 +106,12 @@ export const charities = pgTable(
      * link there — keeping the "runs on your website" promise end to end.
      */
     embedPageUrl: text("embed_page_url"),
+    /**
+     * Standalone donor wall: the charity's own EXISTING Stripe account,
+     * connected read-only via OAuth. Separate from stripeAccountId (the
+     * shop's account) so the two products never interfere.
+     */
+    tickerStripeAccountId: text("ticker_stripe_account_id"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()
@@ -157,6 +163,26 @@ export const productPhotos = pgTable(
     sortOrder: integer("sort_order").notNull().default(0),
   },
   (t) => [index("product_photos_product_idx").on(t.productId)],
+);
+
+/**
+ * Charity-curated "recognized supporters" for the standalone donor wall.
+ * Names here are added by the charity, which attests it has the donor's
+ * permission — the traditional donor-recognition-list model. We never
+ * derive public names from payment data.
+ */
+export const wallEntries = pgTable(
+  "wall_entries",
+  {
+    id: id(),
+    charityId: text("charity_id")
+      .notNull()
+      .references(() => charities.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    amountCents: integer("amount_cents"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("wall_entries_charity_idx").on(t.charityId)],
 );
 
 export type ContributionStatus = "pending" | "succeeded" | "refunded";
