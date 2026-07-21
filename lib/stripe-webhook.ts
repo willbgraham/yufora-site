@@ -22,6 +22,40 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
       const amount = session.amount_total;
       if (!productId || !charityId || !amount) return "ignored: missing metadata";
 
+      // SECURITY — bind the event to the connected account that emitted it.
+      // This is a Connect endpoint: it receives validly-signed events from
+      // EVERY connected account under the platform, and the metadata is
+      // attacker-controllable (any onboarded charity can create a Checkout
+      // Session on their OWN account carrying another charity's ids). Trusting
+      // metadata alone would let one tenant write contributions, inflate
+      // funding, and trigger victim-branded emails for another. So: the
+      // charity named in the metadata must actually own the account that
+      // produced this event, and the product must belong to that charity.
+      const rows = await db
+        .select({
+          name: charities.name,
+          slug: charities.slug,
+          embedPageUrl: charities.embedPageUrl,
+          stripeAccountId: charities.stripeAccountId,
+          ownerEmail: user.email,
+        })
+        .from(charities)
+        .innerJoin(user, eq(charities.ownerUserId, user.id))
+        .where(eq(charities.id, charityId))
+        .limit(1);
+      const charity = rows[0];
+      if (!charity) return "ignored: unknown charity";
+      if (!event.account || event.account !== charity.stripeAccountId) {
+        return "ignored: event account does not match charity";
+      }
+
+      const owns = await db
+        .select({ id: products.id })
+        .from(products)
+        .where(and(eq(products.id, productId), eq(products.charityId, charityId)))
+        .limit(1);
+      if (owns.length === 0) return "ignored: product not owned by charity";
+
       // Donor-wall consent from the checkout custom field; anything missing
       // or unexpected collapses to anonymous.
       const displayRaw = session.custom_fields?.find(
@@ -55,10 +89,11 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
       if (inserted.length === 0) return "duplicate: already recorded";
 
       // Progress cache moves only when a new row was actually inserted.
+      // Scoped to the charity as defense in depth (ownership already checked).
       const [updated] = await db
         .update(products)
         .set({ fundedCents: sql`${products.fundedCents} + ${amount}` })
-        .where(eq(products.id, productId))
+        .where(and(eq(products.id, productId), eq(products.charityId, charityId)))
         .returning({
           title: products.title,
           fundedCents: products.fundedCents,
@@ -70,43 +105,29 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
       // the donation is already recorded.
       const donorEmail = session.customer_details?.email;
       if (donorEmail && updated) {
-        const rows = await db
-          .select({
-            name: charities.name,
-            slug: charities.slug,
-            embedPageUrl: charities.embedPageUrl,
-            ownerEmail: user.email,
-          })
-          .from(charities)
-          .innerJoin(user, eq(charities.ownerUserId, user.id))
-          .where(eq(charities.id, charityId))
-          .limit(1);
-        const charity = rows[0];
-        if (charity) {
-          // Link the donor to the shop on the CHARITY's own site when it's
-          // configured (embed.js re-opens the item there); hosted page as
-          // fallback.
-          let productUrl = `${siteConfig.url}/s/${charity.slug}/p/${productId}`;
-          if (charity.embedPageUrl) {
-            try {
-              const u = new URL(charity.embedPageUrl);
-              u.searchParams.set("yufora_item", productId);
-              productUrl = u.toString();
-            } catch {
-              // keep hosted fallback
-            }
+        // Link the donor to the shop on the CHARITY's own site when it's
+        // configured (embed.js re-opens the item there); hosted page as
+        // fallback.
+        let productUrl = `${siteConfig.url}/s/${charity.slug}/p/${productId}`;
+        if (charity.embedPageUrl) {
+          try {
+            const u = new URL(charity.embedPageUrl);
+            u.searchParams.set("yufora_item", productId);
+            productUrl = u.toString();
+          } catch {
+            // keep hosted fallback
           }
-          await sendDonorConfirmation({
-            donorEmail,
-            donorName: session.customer_details?.name ?? null,
-            charityName: charity.name,
-            charityReplyTo: charity.ownerEmail,
-            productTitle: updated.title,
-            amountCents: amount,
-            productUrl,
-            nowFullyFunded: updated.fundedCents >= updated.goalCents,
-          });
         }
+        await sendDonorConfirmation({
+          donorEmail,
+          donorName: session.customer_details?.name ?? null,
+          charityName: charity.name,
+          charityReplyTo: charity.ownerEmail,
+          productTitle: updated.title,
+          amountCents: amount,
+          productUrl,
+          nowFullyFunded: updated.fundedCents >= updated.goalCents,
+        });
       }
 
       return `recorded: ${inserted[0].id}`;

@@ -35,9 +35,20 @@ export async function getTotalsForCharity(charityId: string) {
   };
 }
 
-/** RFC 4180-ish CSV escaping: quote when needed, double internal quotes. */
+/**
+ * CSV field escaping with formula-injection defense.
+ *
+ * RFC 4180 quoting handles delimiters/quotes/newlines. Separately, spreadsheet
+ * apps execute a cell whose text begins with =, +, -, @, or a control char —
+ * and donor names are attacker-controlled free text from Stripe checkout. We
+ * prefix any such value with a single quote so Excel/Sheets treat it as text,
+ * not a formula.
+ */
 function csvField(value: string): string {
-  return /[",\n\r]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  const guarded = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  return /[",\n\r]/.test(guarded)
+    ? `"${guarded.replace(/"/g, '""')}"`
+    : guarded;
 }
 
 export function contributionsToCsv(
