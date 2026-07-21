@@ -48,11 +48,10 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        {/* TODO: registered company name, number and address go here —
-            a disproportionately strong legitimacy signal for this audience. */}
+        {/* TODO: add registered address when provided. */}
         <p className="mt-10 border-t border-warm-200 pt-6 text-sm text-warm-600">
-          © {new Date().getFullYear()} Yufora. We don&rsquo;t track you — this
-          site runs no analytics or advertising cookies.
+          © {new Date().getFullYear()} Yufora, LLC. We don&rsquo;t track you —
+          this site runs no analytics or advertising cookies.
         </p>
       </Container>
     </footer>
