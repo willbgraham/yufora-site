@@ -25,30 +25,41 @@
     return;
   }
 
-  // If the donor was just sent back from checkout, the charity's page URL
-  // carries yufora_item / yufora_thanks — open the iframe straight to that
-  // item (with the thank-you banner when the payment completed).
+  // Which widget: the shop (default) or the donor wall
+  // (data-widget="wall", optionally data-mode="top").
+  var widget = script.getAttribute("data-widget") || "shop";
   var src = origin + "/embed/" + encodeURIComponent(shop);
-  try {
-    var host = new URL(window.location.href);
-    var item = host.searchParams.get("yufora_item");
-    if (item && /^[\w-]{1,64}$/.test(item)) {
-      src += "/p/" + encodeURIComponent(item);
-      if (host.searchParams.get("yufora_thanks") === "1") {
-        src += "?donated=1";
-      }
+
+  if (widget === "wall") {
+    src += "/wall";
+    if (script.getAttribute("data-mode") === "top") {
+      src += "?mode=top";
     }
-  } catch {
-    /* older browsers: plain grid */
+  } else {
+    // If the donor was just sent back from checkout, the charity's page URL
+    // carries yufora_item / yufora_thanks — open the iframe straight to that
+    // item (with the thank-you banner when the payment completed).
+    try {
+      var host = new URL(window.location.href);
+      var item = host.searchParams.get("yufora_item");
+      if (item && /^[\w-]{1,64}$/.test(item)) {
+        src += "/p/" + encodeURIComponent(item);
+        if (host.searchParams.get("yufora_thanks") === "1") {
+          src += "?donated=1";
+        }
+      }
+    } catch {
+      /* older browsers: plain grid */
+    }
   }
 
   var iframe = document.createElement("iframe");
   iframe.src = src;
-  iframe.title = "Wishlist shop";
+  iframe.title = widget === "wall" ? "Supporter wall" : "Wishlist shop";
   iframe.style.display = "block";
   iframe.style.width = "100%";
   iframe.style.border = "0";
-  iframe.style.height = "600px";
+  iframe.style.height = widget === "wall" ? "320px" : "600px";
   iframe.setAttribute("loading", "lazy");
 
   script.parentNode.insertBefore(iframe, script.nextSibling);

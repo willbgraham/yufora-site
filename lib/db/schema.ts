@@ -161,6 +161,9 @@ export const productPhotos = pgTable(
 
 export type ContributionStatus = "pending" | "succeeded" | "refunded";
 
+/** What the donor agreed to show on the public donor wall. */
+export type ContributionDisplay = "name" | "name_amount" | "anonymous";
+
 export const contributions = pgTable(
   "contributions",
   {
@@ -180,6 +183,14 @@ export const contributions = pgTable(
       .$type<ContributionStatus>()
       .notNull()
       .default("pending"),
+    /**
+     * Chosen by the donor at checkout (Stripe custom field). Nothing is ever
+     * shown publicly beyond what this permits; the safe default is anonymous.
+     */
+    displayPreference: text("display_preference")
+      .$type<ContributionDisplay>()
+      .notNull()
+      .default("anonymous"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [

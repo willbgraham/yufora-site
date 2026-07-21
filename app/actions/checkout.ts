@@ -122,6 +122,23 @@ export async function startCheckout(
           yuforaProductId: product.id,
           yuforaCharityId: charity.id,
         },
+        // Donor-wall consent, decided by the donor on the payment page.
+        // Skipping the field means anonymous — the safe default.
+        custom_fields: [
+          {
+            key: "display",
+            label: { type: "custom", custom: "Show my support publicly?" },
+            type: "dropdown",
+            optional: true,
+            dropdown: {
+              options: [
+                { label: "Show my name", value: "name" },
+                { label: "Show my name and amount", value: "name_amount" },
+                { label: "Keep me anonymous", value: "anonymous" },
+              ],
+            },
+          },
+        ],
         success_url: successUrl,
         cancel_url: cancelUrl,
       },

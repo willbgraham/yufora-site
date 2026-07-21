@@ -190,6 +190,23 @@ export default async function AdminPage() {
               snippet={`<script src="${siteConfig.url}/embed.js" data-shop="${charity.slug}" async></script>`}
             />
           </div>
+          <div className="mt-4">
+            <p className="text-sm font-medium text-warm-900">
+              Donor wall{" "}
+              <span className="font-normal text-warm-500">
+                (shows only what each donor agreed to share)
+              </span>
+            </p>
+            <div className="mt-1.5">
+              <EmbedSnippet
+                snippet={`<script src="${siteConfig.url}/embed.js" data-shop="${charity.slug}" data-widget="wall" async></script>`}
+              />
+            </div>
+            <p className="mt-1.5 text-xs text-warm-500">
+              Add <code className="rounded bg-warm-100 px-1">data-mode=&quot;top&quot;</code>{" "}
+              for a top-supporters list instead of recent gifts.
+            </p>
+          </div>
           <EmbedPageUrlForm defaultValue={charity.embedPageUrl ?? ""} />
           <Link
             href={`/embed/${charity.slug}`}

@@ -22,6 +22,16 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
       const amount = session.amount_total;
       if (!productId || !charityId || !amount) return "ignored: missing metadata";
 
+      // Donor-wall consent from the checkout custom field; anything missing
+      // or unexpected collapses to anonymous.
+      const displayRaw = session.custom_fields?.find(
+        (f) => f.key === "display",
+      )?.dropdown?.value;
+      const displayPreference =
+        displayRaw === "name" || displayRaw === "name_amount"
+          ? displayRaw
+          : "anonymous";
+
       // Idempotency: the unique session id makes replays insert nothing.
       const inserted = await db
         .insert(contributions)
@@ -37,6 +47,7 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
               ? session.payment_intent
               : (session.payment_intent?.id ?? null),
           status: "succeeded",
+          displayPreference,
         })
         .onConflictDoNothing({ target: contributions.stripeCheckoutSessionId })
         .returning({ id: contributions.id });
