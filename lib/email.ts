@@ -49,7 +49,7 @@ export async function deliverLead(
       to,
       // Lets you reply straight from your inbox to the nonprofit.
       replyTo: lead.email,
-      subject: `Early access request — ${lead.orgName}`,
+      subject: `New inquiry — ${lead.orgName}`,
       text: lines,
     });
 

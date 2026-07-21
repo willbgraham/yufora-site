@@ -16,8 +16,8 @@ export const navLinks = [
 ] as const;
 
 /**
- * Single CTA wording across the whole site. "Book a demo" would over-promise —
- * there is nothing to demo yet.
+ * Single CTA wording across the whole site. Services are bookable today and
+ * the shop platform is live with its first shops — the ask is real now.
  */
-export const CTA_LABEL = "Request early access";
-export const CTA_HREF = "/request-access";
+export const CTA_LABEL = "Get started";
+export const CTA_HREF = "/start";

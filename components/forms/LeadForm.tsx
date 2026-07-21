@@ -62,12 +62,11 @@ export default function LeadForm() {
           tabIndex={-1}
           className="font-display text-2xl text-teal-900 outline-none"
         >
-          Got it. You&rsquo;re on the list.
+          Got it — we&rsquo;re on it.
         </h3>
         <p className="mt-3 text-warm-700">
-          We read every one of these ourselves. If what you&rsquo;re planning
-          fits the first group, you&rsquo;ll hear from a real person within two
-          business days — not an automated sequence.
+          We read every one of these ourselves. A real person will get back to
+          you within two business days — not an automated sequence.
         </p>
       </div>
     );
@@ -228,7 +227,7 @@ export default function LeadForm() {
       </div>
 
       <Button type="submit" size="lg" disabled={pending} className="w-full sm:w-auto">
-        {pending ? "Sending…" : "Request early access"}
+        {pending ? "Sending…" : "Get started"}
       </Button>
 
       <p className="text-sm text-warm-600">

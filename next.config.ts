@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },
+  async redirects() {
+    return [
+      // The CTA graduated from "request early access" to "get started".
+      { source: "/request-access", destination: "/start", permanent: false },
+    ];
+  },
   async headers() {
     return [
       {

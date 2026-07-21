@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/films",
     "/services",
     "/about",
-    "/request-access",
+    "/start",
     "/privacy",
     "/terms",
   ];

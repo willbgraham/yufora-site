@@ -51,7 +51,7 @@ export default function AboutPage() {
             with no customers yet, the founder is the trust. */}
         <SectionHeading
           title="Who's behind it"
-          lead="Yufora is founded and run by a small team that has spent years around nonprofit fundraising. We'll put real names and faces here as we open up — this section is a placeholder while the site is in early access."
+          lead="Yufora is founded and run by a small team that has spent years around nonprofit fundraising. We'll put real names and faces here shortly — this section is the next thing on our own wishlist."
         />
       </Section>
 

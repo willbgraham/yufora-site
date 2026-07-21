@@ -25,10 +25,10 @@ export default function SiteFooter() {
               </Link>
             ))}
             <Link
-              href="/request-access"
+              href="/start"
               className="text-warm-700 hover:text-pink-700"
             >
-              Request early access
+              Get started
             </Link>
           </nav>
 

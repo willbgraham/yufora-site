@@ -341,7 +341,7 @@ export default function Home() {
               },
               {
                 q: "When can we start?",
-                a: "The services — films, content packs, Ad Grants management, email marketing — are available now. The shop and contests are onboarding a first group of nonprofits; request early access and we'll tell you the timeline honestly.",
+                a: "The services — films, content packs, Ad Grants management, email marketing — are available now. The shop is onboarding its first organizations now, and contests follow; get in touch and we'll tell you the timeline honestly.",
               },
               {
                 q: "Can you just run everything for us?",
@@ -349,7 +349,7 @@ export default function Home() {
               },
               {
                 q: "What does it cost?",
-                a: "Pricing isn't final. No setup fee and no annual contract, and early-access organizations see the numbers first.",
+                a: "Services are quoted up front before any work starts. Tool pricing isn't final — no setup fee, no annual contract, and the organizations already with us see the numbers first.",
               },
             ]}
           />

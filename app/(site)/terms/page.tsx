@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Terms",
-  description: "The terms for using the Yufora website while it is in early access.",
+  description: "The terms for using the Yufora website.",
 };
 
 export default function TermsPage() {
@@ -13,7 +13,7 @@ export default function TermsPage() {
     <Section>
       <h1 className="mb-2 text-4xl">Terms</h1>
       <p className="mb-10 text-warm-600">
-        A short set of terms for this website while Yufora is in early access.
+        A short set of terms for this website while Yufora is young.
         Full product terms will follow, reviewed by counsel, before anything
         goes live.
       </p>
@@ -26,9 +26,9 @@ export default function TermsPage() {
           availability.
         </p>
 
-        <h2>Early access</h2>
+        <h2>Getting started</h2>
         <p>
-          Requesting early access puts you on a list for us to contact. It
+          Sending the get-started form asks us to contact you. It
           isn&rsquo;t a contract, a purchase, or a commitment on either side.
           Pricing and product terms will be shared before you decide anything.
         </p>
