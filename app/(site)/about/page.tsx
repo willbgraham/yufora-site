@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Section from "@/components/layout/Section";
 import SectionHeading from "@/components/marketing/SectionHeading";
 import CTABand from "@/components/marketing/CTABand";
@@ -46,13 +47,47 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      <Section tone="tint">
-        {/* TODO: replace with the founder's real name, photo, and bio —
-            with no customers yet, the founder is the trust. */}
-        <SectionHeading
-          title="Who's behind it"
-          lead="Yufora is founded and run by a small team that has spent years around nonprofit fundraising. We'll put real names and faces here shortly — this section is the next thing on our own wishlist."
-        />
+      <Section tone="tint" labelledBy="founder-heading">
+        <div className="grid items-center gap-10 lg:grid-cols-[3fr_2fr]">
+          <div>
+            <h2 id="founder-heading" className="text-3xl sm:text-4xl">
+              Who&rsquo;s behind it
+            </h2>
+            <div className="mt-4 space-y-4 text-lg text-warm-700">
+              <p>
+                Yufora is built by <strong className="text-warm-900">William
+                Graham</strong> — a filmmaker and builder who has spent years
+                on the ground with nonprofits, camera in hand, telling the
+                stories behind their work.
+              </p>
+              <p>
+                Yufora came out of watching the same thing happen everywhere:
+                organizations doing remarkable work, asking for support in the
+                abstract, with tools that sent their donors somewhere else.
+                The fix seemed obvious — show people the real things the work
+                needs, on the organization&rsquo;s own website, with the money
+                going straight to them.
+              </p>
+              <p>
+                Write to him directly:{" "}
+                <a
+                  href="mailto:william@yufora.com"
+                  className="text-pink-700 hover:underline"
+                >
+                  william@yufora.com
+                </a>
+              </p>
+            </div>
+          </div>
+          <Image
+            src="/films-hero.jpg"
+            alt="William Graham filming on location, trading high-fives with kids between takes"
+            width={1000}
+            height={1569}
+            sizes="(min-width: 1024px) 380px, 80vw"
+            className="mx-auto w-full max-w-sm rounded-xl lg:max-w-none"
+          />
+        </div>
       </Section>
 
       <Section>

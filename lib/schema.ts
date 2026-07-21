@@ -10,6 +10,7 @@ export const ROLES = [
 
 export const INTERESTS = [
   { value: "shop", label: "Wishlist shop" },
+  { value: "donor-wall", label: "Donor wall" },
   { value: "managed-store", label: "Done-for-you shop / store" },
   { value: "contests", label: "Contests" },
   { value: "films", label: "A documentary film" },

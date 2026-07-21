@@ -207,6 +207,53 @@ export default function Home() {
         </ButtonLink>
       </Section>
 
+      {/* 6b — Donor wall (the start-here product) */}
+      <Section tone="tint" labelledBy="wall-heading">
+        <div className="grid items-center gap-8 lg:grid-cols-[3fr_2fr]">
+          <div>
+            <Eyebrow>New — the donor wall</Eyebrow>
+            <h2 id="wall-heading" className="text-3xl sm:text-4xl">
+              Not ready to move your donations? Start here.
+            </h2>
+            <p className="mt-4 text-lg text-warm-700">
+              A live wall of giving on your website — total raised, gifts as
+              they happen, supporters you choose to honor. Connects{" "}
+              <em>read-only</em> to the Stripe you already use. Up in minutes,
+              nothing to migrate.
+            </p>
+            <ButtonLink href="/donor-wall" variant="ghost" className="mt-6">
+              How the donor wall works →
+            </ButtonLink>
+          </div>
+          <div className="rounded-xl border border-warm-200 bg-white p-5">
+            <p className="text-center font-display text-3xl text-pink-700">
+              $12,400
+            </p>
+            <p className="text-center text-sm text-warm-600">
+              raised this month · 38 gifts
+            </p>
+            <div className="mt-3 space-y-2">
+              {["Someone gave $50", "Someone gave $250", "Someone gave $25"].map(
+                (t, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2.5 rounded-lg border border-warm-100 px-3 py-2 text-sm text-warm-800"
+                  >
+                    <span className="flex size-6 items-center justify-center rounded-full bg-teal-100 text-xs text-teal-700">
+                      ♥
+                    </span>
+                    {t}
+                  </div>
+                ),
+              )}
+            </div>
+            <p className="mt-2 text-center text-xs text-warm-500">
+              illustration — your wall shows your real numbers
+            </p>
+          </div>
+        </div>
+      </Section>
+
       {/* 7 — Yufora Films */}
       <Section tone="dark" labelledBy="films-heading">
         <div className="max-w-3xl">
@@ -295,8 +342,8 @@ export default function Home() {
           />
           <ul className="space-y-4 self-center">
             {[
-              "The wishlist shop is in build. First campaigns run this season.",
-              "Contests follow shortly after.",
+              "The donor wall is live — connect your existing Stripe and be up this week.",
+              "The wishlist shop is in build. First campaigns run this season. Contests follow.",
               "The services — films, content packs, Ad Grants, email — are live now. Those you can book today.",
             ].map((s) => (
               <li
@@ -352,6 +399,10 @@ export default function Home() {
               {
                 q: "When can we start?",
                 a: "The services — films, content packs, Ad Grants management, email marketing — are available now. The shop is onboarding its first organizations now, and contests follow; get in touch and we'll tell you the timeline honestly.",
+              },
+              {
+                q: "We're not ready to move our donations. Can we still use Yufora?",
+                a: "Yes — start with the donor wall. It connects read-only to the Stripe account you already use and puts live giving activity on your website in minutes. Nothing about your existing donation setup changes.",
               },
               {
                 q: "Can you just run everything for us?",
