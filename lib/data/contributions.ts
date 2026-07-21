@@ -12,6 +12,7 @@ export async function getContributionsForCharity(charityId: string) {
       donorName: contributions.donorName,
       donorEmail: contributions.donorEmail,
       status: contributions.status,
+      displayPreference: contributions.displayPreference,
       productTitle: products.title,
     })
     .from(contributions)

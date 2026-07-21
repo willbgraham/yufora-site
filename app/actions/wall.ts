@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { wallEntries } from "@/lib/db/schema";
+import { contributions, wallEntries } from "@/lib/db/schema";
 import { getCharityForUser } from "@/lib/data/charity";
 import { parseDollarsToCents } from "@/lib/money";
 import { requireSession } from "@/lib/session";
@@ -56,6 +56,30 @@ export async function addWallEntry(
 
   revalidatePath("/admin/wall");
   return { status: "idle", message: "Added." };
+}
+
+/**
+ * Revokes a gift's public display — e.g. when a donor emails the charity
+ * asking to come off the wall. One-way to anonymous by design: consent is
+ * opt-in at checkout and revocable forever after, never re-grantable by
+ * anyone but the donor.
+ */
+export async function hideContributionFromWall(contributionId: string) {
+  const session = await requireSession();
+  const charity = await getCharityForUser(session.user.id);
+  if (!charity) return;
+
+  await db
+    .update(contributions)
+    .set({ displayPreference: "anonymous" })
+    .where(
+      and(
+        eq(contributions.id, contributionId),
+        eq(contributions.charityId, charity.id),
+      ),
+    );
+
+  revalidatePath("/admin/contributions");
 }
 
 export async function deleteWallEntry(entryId: string) {

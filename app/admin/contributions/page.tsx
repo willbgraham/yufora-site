@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import HideFromWallButton from "@/components/admin/HideFromWallButton";
 import { getCharityForUser } from "@/lib/data/charity";
 import {
   getContributionsForCharity,
@@ -72,6 +73,7 @@ export default async function ContributionsPage() {
                   Amount
                 </th>
                 <th scope="col" className="px-4 py-3 font-medium">Status</th>
+                <th scope="col" className="px-4 py-3 font-medium">On wall</th>
               </tr>
             </thead>
             <tbody>
@@ -102,6 +104,23 @@ export default async function ContributionsPage() {
                     >
                       {row.status}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {row.displayPreference === "anonymous" ? (
+                      <span className="text-xs text-warm-500">Anonymous</span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-warm-700">
+                          {row.displayPreference === "name_amount"
+                            ? "Name + amount"
+                            : "Name"}
+                        </span>
+                        <HideFromWallButton
+                          contributionId={row.id}
+                          donorLabel={row.donorName ?? "this donor"}
+                        />
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
