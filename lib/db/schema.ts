@@ -5,6 +5,7 @@ import {
   boolean,
   timestamp,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 const id = () =>
@@ -252,4 +253,73 @@ export const articles = pgTable(
       .$onUpdate(() => new Date()),
   },
   (t) => [index("articles_status_idx").on(t.status, t.publishedAt)],
+);
+
+export type NewsSourceType = "rss" | "youtube";
+
+/** A feed the newsroom pulls from (blog RSS/Atom, or a YouTube channel feed). */
+export const newsSources = pgTable(
+  "news_sources",
+  {
+    id: id(),
+    type: text("type").$type<NewsSourceType>().notNull(),
+    url: text("url").notNull(),
+    title: text("title").notNull(), // editor label + attribution name
+    active: boolean("active").notNull().default(true),
+    // Fetch health, surfaced in the source manager.
+    lastFetchedAt: timestamp("last_fetched_at"),
+    lastStatus: text("last_status"),
+    lastError: text("last_error"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [index("news_sources_active_idx").on(t.active)],
+);
+
+export type NewsItemStatus = "pending" | "approved" | "rejected";
+export type NewsItemKind = "article" | "youtube" | "instagram";
+
+/** A single curated item — from a feed or manually added — awaiting or past
+ *  editorial review. Nothing is public until status = "approved". */
+export const newsItems = pgTable(
+  "news_items",
+  {
+    id: id(),
+    // null for manually-added links (no feed source)
+    sourceId: text("source_id").references(() => newsSources.id, {
+      onDelete: "cascade",
+    }),
+    kind: text("kind").$type<NewsItemKind>().notNull().default("article"),
+    externalId: text("external_id").notNull(), // guid / videoId / normalized link
+    // Captured from the source (immutable originals):
+    title: text("title").notNull(),
+    excerpt: text("excerpt").notNull().default(""), // SANITIZED html, char-capped
+    rawExcerpt: text("raw_excerpt"), // raw original, for re-sanitize
+    link: text("link").notNull(), // canonical source URL
+    imageUrl: text("image_url"),
+    embedUrl: text("embed_url"), // safe youtube-nocookie embed URL, when a video
+    author: text("author"),
+    publishedAt: timestamp("published_at"),
+    // Editorial overlay (nullable — a re-fetch never clobbers curation):
+    editedTitle: text("edited_title"),
+    editedExcerpt: text("edited_excerpt"),
+    editorNote: text("editor_note"),
+    status: text("status").$type<NewsItemStatus>().notNull().default("pending"),
+    approvedAt: timestamp("approved_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    index("news_items_status_idx").on(t.status, t.publishedAt),
+    index("news_items_source_idx").on(t.sourceId),
+    // Dedupe feed items. Manual items (sourceId null) don't collide here
+    // (Postgres NULLs are distinct) — those are deduped app-side on link.
+    uniqueIndex("news_items_source_ext_idx").on(t.sourceId, t.externalId),
+  ],
 );
