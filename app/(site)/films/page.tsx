@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Section from "@/components/layout/Section";
+import HeroLoopVideo from "@/components/marketing/HeroLoopVideo";
 import Steps from "@/components/marketing/Steps";
 import Eyebrow from "@/components/marketing/Eyebrow";
 import { ButtonLink } from "@/components/ui/Button";
@@ -39,16 +40,12 @@ export default function FilmsPage() {
               Talk to us about a film
             </ButtonLink>
           </div>
-          <video
-            controls
-            playsInline
-            preload="none"
+          <HeroLoopVideo
+            src="/films-hero.mp4"
             poster="/films-hero-poster.jpg"
-            aria-label="On location with the Yufora film team — filming a documentary at an elementary school"
-            className="mx-auto aspect-[9/16] w-full max-w-sm rounded-xl bg-warm-950 object-cover ring-1 ring-white/10 lg:max-w-none"
-          >
-            <source src="/films-hero.mp4" type="video/mp4" />
-          </video>
+            label="On location with the Yufora film team — being greeted by kids while filming a documentary at an elementary school"
+            className="mx-auto w-full max-w-sm lg:max-w-none"
+          />
         </div>
       </Section>
 
