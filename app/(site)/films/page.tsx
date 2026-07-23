@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Section from "@/components/layout/Section";
 import Steps from "@/components/marketing/Steps";
 import Eyebrow from "@/components/marketing/Eyebrow";
@@ -40,15 +39,16 @@ export default function FilmsPage() {
               Talk to us about a film
             </ButtonLink>
           </div>
-          <Image
-            src="/films-hero.jpg"
-            alt="Filming on location — trading high-fives with kids between takes"
-            width={1000}
-            height={1569}
-            priority
-            sizes="(min-width: 1024px) 400px, 90vw"
-            className="mx-auto w-full max-w-sm rounded-xl ring-1 ring-white/10 lg:max-w-none"
-          />
+          <video
+            controls
+            playsInline
+            preload="none"
+            poster="/films-hero-poster.jpg"
+            aria-label="On location with the Yufora film team — filming a documentary at an elementary school"
+            className="mx-auto aspect-[9/16] w-full max-w-sm rounded-xl bg-warm-950 object-cover ring-1 ring-white/10 lg:max-w-none"
+          >
+            <source src="/films-hero.mp4" type="video/mp4" />
+          </video>
         </div>
       </Section>
 
