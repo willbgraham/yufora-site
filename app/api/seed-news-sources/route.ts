@@ -1,8 +1,8 @@
 // TEMPORARY preview-only route to seed verified newsroom sources and ingest
 // them once, so the staging review queue has real content. Removed after use.
-import { sql, eq } from "drizzle-orm";
+import { sql, eq, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { newsSources } from "@/lib/db/schema";
+import { newsItems, newsSources } from "@/lib/db/schema";
 import { ingestOneSource } from "@/lib/news/ingest";
 
 type Seed = { type: "rss" | "youtube"; url: string; title: string };
@@ -101,5 +101,21 @@ export async function GET() {
     }
   }
 
-  return Response.json({ seeded: SOURCES.length, report });
+  const pending = await db
+    .select({ id: newsItems.id })
+    .from(newsItems)
+    .where(eq(newsItems.status, "pending"));
+  const samples = await db
+    .select({ title: newsItems.title, author: newsItems.author, kind: newsItems.kind })
+    .from(newsItems)
+    .where(eq(newsItems.status, "pending"))
+    .orderBy(desc(newsItems.publishedAt))
+    .limit(8);
+
+  return Response.json({
+    seeded: SOURCES.length,
+    report,
+    pendingTotal: pending.length,
+    samples,
+  });
 }
