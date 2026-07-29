@@ -10,11 +10,11 @@ import { CTA_HREF, BOOK_CALL_URL } from "@/lib/site";
 export const metadata: Metadata = {
   title: { absolute: "Yufora — Short documentaries for nonprofits" },
   description:
-    "Short documentaries for nonprofits — real people, a real place, the actual work you did this year, cut into a film that opens your appeal.",
+    "Yufora Films makes short documentaries for nonprofits — a small crew, a day or two on location, and a film built to open your next fundraising campaign.",
   openGraph: {
     title: "Yufora — Short documentaries for nonprofits",
     description:
-      "Short documentaries for nonprofits — the film that opens your appeal and makes the ask land.",
+      "We film the real work; you raise the money. Short documentaries for nonprofits, shot on location.",
   },
 };
 
@@ -30,22 +30,19 @@ export default function Home() {
           <div>
             <Eyebrow>Yufora Films</Eyebrow>
             <h1 className="text-[length:var(--text-display)] leading-[1.08] text-white">
-              Short documentaries for nonprofits — made to be why people give.
+              We film the real work. You raise the money.
             </h1>
             <p className="mt-6 text-xl text-warm-300">
-              Real people, a real place, the actual work you did this year, cut
-              into a short film that opens your appeal. Not the pitch — the
-              reason the pitch lands.
-            </p>
-            <p className="mt-6 font-display text-2xl text-white">
-              A tool asks. A story is why they answer.
+              A small crew, a day or two on location, and a short documentary
+              about the people your nonprofit serves — plus the cutdowns you
+              need for email and socials.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <ButtonLink href={CTA_HREF} size="lg">
-                Let&rsquo;s make your film
+              <ButtonLink href="#watch" size="lg">
+                Watch the reel
               </ButtonLink>
-              <ButtonLink href="#watch" size="lg" variant="secondary">
-                Watch a film we made
+              <ButtonLink href={CTA_HREF} size="lg" variant="secondary">
+                Start a project
               </ButtonLink>
             </div>
           </div>
@@ -63,12 +60,11 @@ export default function Home() {
         <div className="mx-auto max-w-3xl text-center">
           <Eyebrow>Watch</Eyebrow>
           <h2 id="watch-heading" className="text-3xl sm:text-4xl">
-            A film we made.
+            Featured film
           </h2>
           <p className="mt-4 text-lg text-warm-700">
-            Three minutes with the people a nonprofit serves — the kind of film
-            that goes at the top of a campaign and gives donors a reason before
-            it ever makes an ask.
+            Shot on location, cut short, and built to open a campaign.
+            Here&rsquo;s one we made.
           </p>
         </div>
         <div className="mx-auto mt-10 max-w-4xl overflow-hidden rounded-xl bg-warm-950 shadow-lg ring-1 ring-warm-200">
@@ -89,7 +85,7 @@ export default function Home() {
       {/* 3 — How a film comes together */}
       <Section tone="tint" labelledBy="films-how">
         <h2 id="films-how" className="max-w-2xl text-3xl sm:text-4xl">
-          How a film comes together
+          Our process, start to finish
         </h2>
         <div className="mt-12">
           <Steps
@@ -116,8 +112,7 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
             <h2 id="packs-heading" className="text-3xl sm:text-4xl">
-              One day of filming.
-              <br />A year of content.
+              One shoot, cut a dozen ways.
             </h2>
             <p className="mt-4 text-lg text-warm-700">
               The documentary is the centerpiece — the content pack is
@@ -170,16 +165,16 @@ export default function Home() {
       <Section tone="dark" labelledBy="cta-heading">
         <div className="mx-auto max-w-2xl text-center">
           <h2 id="cta-heading" className="text-3xl text-white sm:text-4xl">
-            Let&rsquo;s make your film.
+            Bring us on location.
           </h2>
           <p className="mt-4 text-lg text-warm-300">
-            Tell us about the work you did this year and the campaign it&rsquo;s
-            for. We&rsquo;ll figure out the story worth filming — you can book it
-            today.
+            Tell us where the work happens and who it&rsquo;s for. We&rsquo;ll
+            spend a day or two there and cut you a film — plus the pieces to
+            share it.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <ButtonLink href={CTA_HREF} size="lg">
-              Let&rsquo;s make your film
+              Start a project
             </ButtonLink>
             {BOOK_CALL_URL && (
               <ButtonLink href={BOOK_CALL_URL} size="lg" variant="secondary">
