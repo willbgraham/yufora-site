@@ -19,6 +19,7 @@ export const navGroups: NavEntry[] = [
   {
     label: "Products",
     items: [
+      { href: "/platform", label: "The platform", desc: "All the tools, one overview" },
       { href: "/shop", label: "Wishlist shop", desc: "Fund the things you need" },
       { href: "/donor-wall", label: "Donor wall", desc: "Live giving on your site" },
       { href: "/contests", label: "Contests", desc: "Grow your donor list" },
@@ -27,7 +28,7 @@ export const navGroups: NavEntry[] = [
   {
     label: "Services",
     items: [
-      { href: "/films", label: "Films", desc: "Documentaries & content packs" },
+      { href: "/", label: "Films", desc: "Documentaries & content packs" },
       {
         href: "/services#adgrants-heading",
         label: "Google Ad Grants",

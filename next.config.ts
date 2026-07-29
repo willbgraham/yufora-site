@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
     return [
       // The CTA graduated from "request early access" to "get started".
       { source: "/request-access", destination: "/start", permanent: false },
+      // Films is now the homepage; the old /films URL points there.
+      { source: "/films", destination: "/", permanent: false },
     ];
   },
   async headers() {

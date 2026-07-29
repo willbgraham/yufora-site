@@ -5,10 +5,10 @@ import { getPublishedArticles } from "@/lib/data/news";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes = [
     "",
+    "/platform",
     "/shop",
     "/donor-wall",
     "/contests",
-    "/films",
     "/services",
     "/news",
     "/about",

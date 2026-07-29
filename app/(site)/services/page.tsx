@@ -134,7 +134,7 @@ export default function ServicesPage() {
         />
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <Link
-            href="/films#content-packs"
+            href="/#content-packs"
             className="rounded-xl border border-warm-200 bg-white p-6 transition-shadow hover:shadow-md"
           >
             <h3 className="text-lg text-warm-900">Content packs</h3>
