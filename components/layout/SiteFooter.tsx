@@ -27,6 +27,9 @@ export default function SiteFooter() {
             <Link href="/start" className="text-warm-700 hover:text-pink-700">
               Get started
             </Link>
+            <Link href="/signin" className="text-warm-700 hover:text-pink-700">
+              Sign in
+            </Link>
           </nav>
 
           <div className="flex flex-col gap-2 text-sm">

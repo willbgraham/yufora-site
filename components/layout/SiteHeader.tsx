@@ -163,6 +163,18 @@ export default function SiteHeader() {
               </Link>
             ),
           )}
+          <Link
+            href="/signin"
+            aria-current={pathname === "/signin" ? "page" : undefined}
+            className={[
+              "rounded-md px-3 py-2 text-base transition-colors",
+              pathname === "/signin"
+                ? "text-pink-700"
+                : "text-warm-700 hover:bg-warm-50 hover:text-warm-900",
+            ].join(" ")}
+          >
+            Sign in
+          </Link>
           <ButtonLink href={CTA_HREF} className="ml-2">
             {CTA_LABEL}
           </ButtonLink>
@@ -233,6 +245,13 @@ export default function SiteHeader() {
                 </Link>
               ),
             )}
+            <Link
+              href="/signin"
+              onClick={close}
+              className="rounded-md px-3 py-3 text-lg text-warm-800 hover:bg-warm-50"
+            >
+              Sign in
+            </Link>
             <ButtonLink href={CTA_HREF} size="lg" className="mt-2" onClick={close}>
               {CTA_LABEL}
             </ButtonLink>

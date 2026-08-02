@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Yufora",
   tagline: "Show your donors exactly what you need.",
   description:
-    "Yufora gives nonprofits a wishlist shop and skill-based contests that run on their own website — with the money going straight into their own account.",
+    "Yufora gives nonprofits a wishlist shop and referral contests that run on their own website — with the money going straight into their own account.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   email: "hello@yufora.com",
 } as const;
@@ -22,7 +22,7 @@ export const navGroups: NavEntry[] = [
       { href: "/platform", label: "The platform", desc: "All the tools, one overview" },
       { href: "/shop", label: "Wishlist shop", desc: "Fund the things you need" },
       { href: "/donor-wall", label: "Donor wall", desc: "Live giving on your site" },
-      { href: "/contests", label: "Contests", desc: "Grow your donor list" },
+      { href: "/contests", label: "Contests", desc: "Grow your email list" },
     ],
   },
   {

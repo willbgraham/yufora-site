@@ -1,5 +1,5 @@
 import type { TickerData } from "@/lib/data/ticker";
-import { timeAgo } from "@/lib/data/wall";
+import { timeAgo } from "@/lib/time";
 import { formatCents } from "@/lib/money";
 
 /**

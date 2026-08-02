@@ -37,8 +37,9 @@ export default function SignInPage() {
         ) : (
           <>
             <p className="mt-3 text-warm-700">
-              No password needed — we&rsquo;ll email you a one-time sign-in
-              link.
+              Enter your email and we&rsquo;ll send you a one-time link. It
+              signs you in — or creates your account if you&rsquo;re new. No
+              password either way.
             </p>
             <form onSubmit={onSubmit} className="mt-8 space-y-4">
               <div>

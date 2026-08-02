@@ -59,7 +59,7 @@ export default function OpengraphImage() {
               maxWidth: 860,
             }}
           >
-            A wishlist shop and skill-based contests that run on your own
+            A wishlist shop and referral contests that run on your own
             website.
           </div>
         </div>

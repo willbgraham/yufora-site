@@ -5,6 +5,7 @@ import FeatureList from "@/components/marketing/FeatureList";
 import Steps from "@/components/marketing/Steps";
 import CTABand from "@/components/marketing/CTABand";
 import Eyebrow from "@/components/marketing/Eyebrow";
+import DonorWallDemo from "@/components/marketing/DonorWallDemo";
 import { ButtonLink } from "@/components/ui/Button";
 import { CTA_HREF, CTA_LABEL } from "@/lib/site";
 
@@ -18,20 +19,23 @@ export default function DonorWallPage() {
   return (
     <>
       <Section tone="tint">
-        <div className="max-w-3xl">
-          <Eyebrow>Donor wall</Eyebrow>
-          <h1 className="text-[length:var(--text-display)] leading-[1.08]">
-            Your donors are giving. Let your website show it.
-          </h1>
-          <p className="mt-6 text-xl text-warm-700">
-            A live wall on your site: money raised this month, gifts as they
-            happen, and the supporters you choose to recognize. It works with
-            the Stripe account you already use — no shop, no migration, no
-            developer.
-          </p>
-          <ButtonLink href={CTA_HREF} size="lg" className="mt-8">
-            {CTA_LABEL}
-          </ButtonLink>
+        <div className="grid items-start gap-10 lg:grid-cols-[3fr_2fr]">
+          <div>
+            <Eyebrow>Donor wall</Eyebrow>
+            <h1 className="text-[length:var(--text-display)] leading-[1.08]">
+              Your donors are giving. Let your website show it.
+            </h1>
+            <p className="mt-6 text-xl text-warm-700">
+              A live wall on your site: money raised this month, gifts as they
+              happen, and the supporters you choose to recognize. It works with
+              the Stripe account you already use — no shop, no migration, no
+              developer.
+            </p>
+            <ButtonLink href={CTA_HREF} size="lg" className="mt-8">
+              {CTA_LABEL}
+            </ButtonLink>
+          </div>
+          <DonorWallDemo className="mx-auto w-full max-w-md lg:max-w-none" />
         </div>
       </Section>
 

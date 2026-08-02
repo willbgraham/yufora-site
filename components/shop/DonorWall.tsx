@@ -1,5 +1,5 @@
 import type { TopSupporter, WallEntry } from "@/lib/data/wall";
-import { timeAgo } from "@/lib/data/wall";
+import { timeAgo } from "@/lib/time";
 import { formatCents } from "@/lib/money";
 
 /** Stable avatar color per name — warm palette, chosen by simple hash. */

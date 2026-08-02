@@ -7,13 +7,14 @@ import SectionHeading from "@/components/marketing/SectionHeading";
 import FeatureList from "@/components/marketing/FeatureList";
 import Steps from "@/components/marketing/Steps";
 import FAQ from "@/components/marketing/FAQ";
+import DonorWallDemo from "@/components/marketing/DonorWallDemo";
 import LeadForm from "@/components/forms/LeadForm";
 import { CTA_LABEL, CTA_HREF } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "The Yufora platform — tools that run on your own site",
   description:
-    "A wishlist shop, a live donor wall, and skill-based contests — nonprofit fundraising tools that run on your own website, with the money going straight into your own account.",
+    "A wishlist shop, a live donor wall, and referral contests — nonprofit fundraising tools that run on your own website, with the money going straight into your own account.",
 };
 
 export default function Platform() {
@@ -27,7 +28,7 @@ export default function Platform() {
             Show your donors exactly what you need.
           </h1>
           <p className="mt-6 max-w-2xl text-xl text-warm-700">
-            Yufora gives nonprofits a wishlist shop and skill-based contests that
+            Yufora gives nonprofits a wishlist shop and referral contests that
             run on your own website — so your supporters never leave your page,
             and every dollar lands in your account, not ours.
           </p>
@@ -184,27 +185,27 @@ export default function Platform() {
         <SectionHeading
           id="contests-heading"
           eyebrow="Contests"
-          title="Run a photo contest that grows your donor list."
-          lead="Skill-judged competitions — creativity, technique, relevance to a theme — run on your own site. Every entrant joins a list you keep, and the legal setup most organizations get wrong is built in."
+          title="Run a referral contest that grows your email list."
+          lead="A supporter shares a link, friends join your list, and someone wins a prize — a sweepstakes with free entry, run on your own site, with the legal setup most organizations get wrong built in."
         />
         <div className="mt-10">
           <FeatureList
             items={[
               {
-                title: "Official Rules, written for your contest",
-                body: "Sponsor details, judging criteria, judges, and how winners are chosen — the disclosures the law actually requires.",
+                title: "Share links that earn entries",
+                body: "Every supporter gets a personal link. Every friend who signs up through it earns them entries — or leaderboard points.",
               },
               {
-                title: "Structured, skill-based judging",
-                body: "A published rubric and independent judges keep it a contest, not a game of chance.",
+                title: "Free entry keeps it clean",
+                body: "No purchase or donation to enter — the line that keeps a sweepstakes legal, built into how contests run.",
               },
               {
-                title: "Entries collected on your site",
-                body: "Supporters upload directly — every entry adds a name and email to your supporter list, with consent and content rights captured up front.",
+                title: "Official Rules, generated",
+                body: "Sponsor details, eligibility, entry period, and how winners are chosen — the disclosures the law actually requires.",
               },
               {
-                title: "Instagram hashtag entries",
-                body: "Coming later — pull entries in by hashtag once entrants link their account.",
+                title: "Every entry joins your list",
+                body: "Name, email, and permission to stay in touch, captured on your site — a list you keep and export.",
               },
             ]}
           />
@@ -232,32 +233,7 @@ export default function Platform() {
               How the donor wall works →
             </ButtonLink>
           </div>
-          <div className="rounded-xl border border-warm-200 bg-white p-5">
-            <p className="text-center font-display text-3xl text-pink-700">
-              $12,400
-            </p>
-            <p className="text-center text-sm text-warm-600">
-              raised this month · 38 gifts
-            </p>
-            <div className="mt-3 space-y-2">
-              {["Someone gave $50", "Someone gave $250", "Someone gave $25"].map(
-                (t, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-2.5 rounded-lg border border-warm-100 px-3 py-2 text-sm text-warm-800"
-                  >
-                    <span className="flex size-6 items-center justify-center rounded-full bg-teal-100 text-xs text-teal-700">
-                      ♥
-                    </span>
-                    {t}
-                  </div>
-                ),
-              )}
-            </div>
-            <p className="mt-2 text-center text-xs text-warm-500">
-              illustration — your wall shows your real numbers
-            </p>
-          </div>
+          <DonorWallDemo />
         </div>
       </Section>
 
@@ -406,8 +382,8 @@ export default function Platform() {
                 a: "That's the typical case, and it's what Stripe's nonprofit setup expects. Talk to us if your situation is different.",
               },
               {
-                q: "Is a photo contest legal to run?",
-                a: "A genuine skill-judged contest is on much firmer ground than a prize draw. We build the Official Rules and judging structure that keep it that way, and we'll flag anything specific to your state.",
+                q: "Are referral contests legal to run?",
+                a: "Run properly, yes. Free entry with no purchase or donation required makes it a sweepstakes, not a lottery — and clear Official Rules are what regulators expect to see. We generate those rules for your contest and flag anything specific to your state.",
               },
               {
                 q: "Who owns the donor and entrant data?",

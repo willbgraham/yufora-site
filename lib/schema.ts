@@ -12,7 +12,8 @@ export const INTERESTS = [
   { value: "shop", label: "Wishlist shop" },
   { value: "donor-wall", label: "Donor wall" },
   { value: "managed-store", label: "Done-for-you shop / store" },
-  { value: "contests", label: "Contests" },
+  // value stays "contests" — it's persisted in lead payloads.
+  { value: "contests", label: "Referral contests" },
   { value: "films", label: "A documentary film" },
   { value: "content-packs", label: "Content packs" },
   { value: "ad-grants", label: "Google Ad Grants management" },
