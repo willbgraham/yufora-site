@@ -7,7 +7,7 @@ import CTABand from "@/components/marketing/CTABand";
 import Eyebrow from "@/components/marketing/Eyebrow";
 import DonorWallDemo from "@/components/marketing/DonorWallDemo";
 import { ButtonLink } from "@/components/ui/Button";
-import { CTA_HREF, CTA_LABEL } from "@/lib/site";
+import { PRODUCT_CTA_HREF, PRODUCT_CTA_LABEL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Live donor wall for your website",
@@ -31,8 +31,8 @@ export default function DonorWallPage() {
               the Stripe account you already use — no shop, no migration, no
               developer.
             </p>
-            <ButtonLink href={CTA_HREF} size="lg" className="mt-8">
-              {CTA_LABEL}
+            <ButtonLink href={PRODUCT_CTA_HREF} size="lg" className="mt-8">
+              {PRODUCT_CTA_LABEL}
             </ButtonLink>
           </div>
           <DonorWallDemo className="mx-auto w-full max-w-md lg:max-w-none" />
@@ -105,7 +105,9 @@ export default function DonorWallPage() {
       <Section tone="tint">
         <CTABand
           title="Put giving on display."
-          body="Tell us about your organization and we'll get your wall live — usually the same week."
+          body="Set it up yourself in a few minutes: connect the Stripe you already use, paste one snippet, done. Free to build, $19/mo when you go live."
+          label={PRODUCT_CTA_LABEL}
+          href={PRODUCT_CTA_HREF}
         />
       </Section>
     </>

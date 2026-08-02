@@ -9,7 +9,7 @@ import Steps from "@/components/marketing/Steps";
 import FAQ from "@/components/marketing/FAQ";
 import DonorWallDemo from "@/components/marketing/DonorWallDemo";
 import LeadForm from "@/components/forms/LeadForm";
-import { CTA_LABEL, CTA_HREF } from "@/lib/site";
+import { CTA_HREF, PRODUCT_CTA_HREF, PRODUCT_CTA_LABEL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "The Yufora platform — tools that run on your own site",
@@ -33,13 +33,20 @@ export default function Platform() {
             and every dollar lands in your account, not ours.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonLink href={CTA_HREF} size="lg">
-              {CTA_LABEL}
+            <ButtonLink href={PRODUCT_CTA_HREF} size="lg">
+              {PRODUCT_CTA_LABEL}
             </ButtonLink>
             <ButtonLink href="#how" size="lg" variant="secondary">
               See how it works
             </ButtonLink>
           </div>
+          <p className="mt-3 text-sm text-warm-600">
+            Free to build. From $19/mo when you go live —{" "}
+            <Link href="/pricing" className="text-pink-700 hover:underline">
+              see the pricing
+            </Link>
+            .
+          </p>
         </div>
       </Section>
 
@@ -335,9 +342,10 @@ export default function Platform() {
           />
           <ul className="space-y-4 self-center">
             {[
-              "The donor wall is live — connect your existing Stripe and be up this week.",
-              "The wishlist shop is in build. First campaigns run this season. Contests follow.",
-              "The services — films, content packs, Ad Grants, email — are live now. Those you can book today.",
+              "The donor wall is live and self-serve — sign up, connect your existing Stripe, and be up today.",
+              "The wishlist shop is live and self-serve too. Build it free, publish when you're ready.",
+              "Referral contests are in build. Get in touch and you'll be in the first group to run one.",
+              "The services — films, content packs, Ad Grants, email — are live now, quoted per project.",
             ].map((s) => (
               <li
                 key={s}
@@ -350,13 +358,18 @@ export default function Platform() {
         </div>
       </Section>
 
-      {/* 9 — Pricing posture */}
+      {/* 9 — Pricing */}
       <Section tone="tint">
         <SectionHeading
           align="center"
-          title="What it will cost."
-          lead="We haven't set final pricing, and we won't invent a number to fill this space. What we can commit to now: no setup fee, no annual contract, and nothing taken from donations you'd have received anyway. Early-access organizations see pricing first — and can walk away."
+          title="What it costs."
+          lead="Flat monthly pricing, published in full: $19 for the donor wall, $49 for the wishlist shop, $79 for everything. No setup fee, no annual contract, and nothing taken from donations you'd have received anyway. Free to build — you only pay when you go live."
         />
+        <div className="mt-8 text-center">
+          <ButtonLink href="/pricing" variant="secondary" size="lg">
+            See the pricing
+          </ButtonLink>
+        </div>
       </Section>
 
       {/* 10 — FAQ */}
@@ -391,7 +404,7 @@ export default function Platform() {
               },
               {
                 q: "When can we start?",
-                a: "The services — films, content packs, Ad Grants management, email marketing — are available now. The shop is onboarding its first organizations now, and contests follow; get in touch and we'll tell you the timeline honestly.",
+                a: "Right now, by yourself — the donor wall and the wishlist shop are self-serve. Enter your email, build it, publish when you're ready. Referral contests are still in build, and the services are quoted per project.",
               },
               {
                 q: "We're not ready to move our donations. Can we still use Yufora?",
@@ -403,7 +416,7 @@ export default function Platform() {
               },
               {
                 q: "What does it cost?",
-                a: "Services are quoted up front before any work starts. Tool pricing isn't final — no setup fee, no annual contract, and the organizations already with us see the numbers first.",
+                a: "$19/mo for the donor wall, $49 for the wishlist shop, $79 for everything — flat, month to month, with no setup fee and nothing taken from your donations. Building is free; you pay only when you go live. Services are quoted separately, up front.",
               },
             ]}
           />

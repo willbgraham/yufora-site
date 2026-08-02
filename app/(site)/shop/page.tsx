@@ -6,7 +6,7 @@ import Steps from "@/components/marketing/Steps";
 import CTABand from "@/components/marketing/CTABand";
 import { ButtonLink } from "@/components/ui/Button";
 import Eyebrow from "@/components/marketing/Eyebrow";
-import { CTA_HREF, CTA_LABEL } from "@/lib/site";
+import { PRODUCT_CTA_HREF, PRODUCT_CTA_LABEL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Wishlist shop for nonprofits",
@@ -27,8 +27,8 @@ export default function ShopPage() {
             Instead of asking for “support,” show your donors the actual things
             your work depends on — and let them buy one, or chip in toward one.
           </p>
-          <ButtonLink href={CTA_HREF} size="lg" className="mt-8">
-            {CTA_LABEL}
+          <ButtonLink href={PRODUCT_CTA_HREF} size="lg" className="mt-8">
+            {PRODUCT_CTA_LABEL}
           </ButtonLink>
         </div>
       </Section>
@@ -126,8 +126,10 @@ export default function ShopPage() {
 
       <Section>
         <CTABand
-          title="Want to see it with your own wishlist?"
-          body="Tell us the five things you'd put on it first — or tell us to do the whole thing for you. Either way, we'll show you how it would look on your site."
+          title="Build it with your own wishlist."
+          body="Add the five things you'd put on it first and see how it looks on your site — free, before you pay anything. Or have us set the whole thing up for you."
+          label={PRODUCT_CTA_LABEL}
+          href={PRODUCT_CTA_HREF}
         />
       </Section>
     </>

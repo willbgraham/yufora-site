@@ -236,8 +236,8 @@ export default async function AdminPage() {
           )}
           {!stripeReady && (
             <p className="mt-4 text-sm text-warm-500">
-              Payments are almost ready — we&rsquo;ll email you when this step
-              opens.
+              Payment setup is temporarily unavailable — please try again
+              shortly, or email hello@yufora.com if it persists.
             </p>
           )}
         </div>

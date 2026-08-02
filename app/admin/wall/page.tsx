@@ -63,8 +63,8 @@ export default async function WallAdminPage() {
           </>
         ) : (
           <p className="mt-2 text-sm text-warm-500">
-            Live activity is almost ready — we&rsquo;ll email you when this
-            step opens.
+            Connecting Stripe is temporarily unavailable — please try again
+            shortly, or email hello@yufora.com if it persists.
           </p>
         )}
       </section>

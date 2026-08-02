@@ -46,6 +46,7 @@ export const navGroups: NavEntry[] = [
       },
     ],
   },
+  { href: "/pricing", label: "Pricing" },
   { href: "/news", label: "News" },
   { href: "/about", label: "About" },
 ];
@@ -61,6 +62,18 @@ export const footerLinks: NavItem[] = navGroups.flatMap((entry) =>
  */
 export const CTA_LABEL = "Get started";
 export const CTA_HREF = "/start";
+
+/**
+ * Self-serve CTA for the products that are actually live and buyable
+ * today (shop, donor wall, platform). Magic-link sign-in doubles as
+ * sign-up, so this is the whole funnel: no form, no call, no wait.
+ *
+ * Deliberately NOT used by the services pages or by Referral Contests —
+ * services are quoted, and contests aren't built yet. Sending either to
+ * a signup screen would promise something we can't deliver.
+ */
+export const PRODUCT_CTA_LABEL = "Start free";
+export const PRODUCT_CTA_HREF = "/signin";
 
 /**
  * Scheduling link (Cal.com/Calendly). When set, the /start page offers
