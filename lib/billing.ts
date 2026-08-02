@@ -22,7 +22,7 @@ export type PlanKey = "donor-wall" | "shop" | "contests" | "everything";
 export type PlanDef = {
   key: PlanKey;
   label: string;
-  /** Env var holding the Stripe Price id (price_...) for this plan. */
+  /** Env var holding this plan's Stripe Price id(s). */
   env: string;
   products: readonly ProductKey[];
   /** Marketing one-liner for the plan picker. */
@@ -32,7 +32,15 @@ export type PlanDef = {
 /**
  * Approved pricing (2026-08): Donor Wall $19 · Shop $49 · Contests $39 ·
  * Everything $79 (sold at $59 until contests ship). Amounts live on the
- * Stripe Prices, not here — re-pricing is an env/dashboard change.
+ * Stripe Prices, not here.
+ *
+ * RE-PRICING: Stripe Prices are immutable, so a price change means
+ * creating a NEW Price. Each env var therefore holds a COMMA-SEPARATED
+ * list: the first id is what new checkouts buy, and every later id is a
+ * grandfathered price that still resolves to this plan. Prepend the new
+ * id; never remove one while any subscriber is still on it, or they'd
+ * silently lose their entitlements while still paying.
+ *   STRIPE_PRICE_SHOP="price_NEW,price_OLD"
  */
 const PLAN_DEFS: readonly PlanDef[] = [
   {
@@ -65,11 +73,23 @@ const PLAN_DEFS: readonly PlanDef[] = [
   },
 ] as const;
 
+export type ConfiguredPlan = PlanDef & {
+  /** What new checkouts buy (first id in the env list). */
+  priceId: string;
+  /** Every id that resolves to this plan, including grandfathered ones. */
+  priceIds: string[];
+};
+
 /** Plans whose Stripe Price is configured — the only ones that exist. */
-export function getPlans(): (PlanDef & { priceId: string })[] {
+export function getPlans(): ConfiguredPlan[] {
   return PLAN_DEFS.flatMap((def) => {
-    const priceId = process.env[def.env];
-    return priceId ? [{ ...def, priceId }] : [];
+    const ids = (process.env[def.env] ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    return ids.length > 0
+      ? [{ ...def, priceId: ids[0], priceIds: ids }]
+      : [];
   });
 }
 
@@ -78,13 +98,13 @@ export function isBillingConfigured(): boolean {
   return isStripeConfigured() && getPlans().length > 0;
 }
 
-export function resolvePlan(priceId: string): PlanDef | null {
-  return getPlans().find((p) => p.priceId === priceId) ?? null;
+export function resolvePlan(priceId: string): ConfiguredPlan | null {
+  return getPlans().find((p) => p.priceIds.includes(priceId)) ?? null;
 }
 
 /** Plans with live amounts fetched from Stripe, for the plan picker UI. */
 export async function getPlansWithAmounts(): Promise<
-  (PlanDef & { priceId: string; amountCents: number | null })[]
+  (ConfiguredPlan & { amountCents: number | null })[]
 > {
   const plans = getPlans();
   return Promise.all(
@@ -111,17 +131,66 @@ const ENTITLED_STATUSES: readonly SubscriptionStatus[] = [
   "past_due",
 ];
 
+/**
+ * Defense in depth against a frozen row: a "trialing" subscription whose
+ * trial ended well in the past can only mean we missed the transition
+ * webhook. Trials are bounded, so this is safe to enforce — the grace
+ * covers ordinary webhook lag around the conversion moment. Deliberately
+ * NOT applied to active/past_due: a missed renewal webhook must never
+ * de-entitle someone who is genuinely paying.
+ */
+const TRIAL_EXPIRY_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
+
+function isStaleTrial(row: {
+  status: SubscriptionStatus;
+  trialEnd: Date | null;
+}): boolean {
+  return (
+    row.status === "trialing" &&
+    row.trialEnd !== null &&
+    Date.now() - row.trialEnd.getTime() > TRIAL_EXPIRY_GRACE_MS
+  );
+}
+
 export type Entitlements = {
   donorWall: boolean;
   shop: boolean;
   contests: boolean;
   plan: PlanKey | null;
   status: SubscriptionStatus | null;
-  reason: "unconfigured" | "exempt" | "subscribed" | "none";
+  /**
+   * unconfigured = billing off · exempt = comped · subscribed = paying ·
+   * lapsed = subscribed before, not now · none = never subscribed.
+   */
+  reason: "unconfigured" | "exempt" | "subscribed" | "lapsed" | "none";
+  cancelAtPeriodEnd: boolean;
+  currentPeriodEnd: Date | null;
+  trialEnd: Date | null;
+  /**
+   * Trial ends within a week — computed here rather than in a component,
+   * since a no-card trial hard-cancels and the warning is time-sensitive.
+   */
+  trialEndsSoon: boolean;
 };
+
+const TRIAL_WARNING_MS = 7 * 24 * 60 * 60 * 1000;
+
+function trialEndsSoon(status: SubscriptionStatus | null, trialEnd: Date | null) {
+  return (
+    status === "trialing" &&
+    trialEnd !== null &&
+    trialEnd.getTime() - Date.now() < TRIAL_WARNING_MS
+  );
+}
 
 const ALL_ON = { donorWall: true, shop: true, contests: true } as const;
 const ALL_OFF = { donorWall: false, shop: false, contests: false } as const;
+const NO_DATES = {
+  cancelAtPeriodEnd: false,
+  currentPeriodEnd: null,
+  trialEnd: null,
+  trialEndsSoon: false,
+} as const;
 
 /**
  * The single entitlement read. Public data-layer functions and admin
@@ -133,34 +202,52 @@ export async function getEntitlementsForCharity(charity: {
   billingExempt: boolean;
 }): Promise<Entitlements> {
   if (!isBillingConfigured()) {
-    return { ...ALL_ON, plan: null, status: null, reason: "unconfigured" };
+    return { ...ALL_ON, ...NO_DATES, plan: null, status: null, reason: "unconfigured" };
   }
   if (charity.billingExempt) {
-    return { ...ALL_ON, plan: null, status: null, reason: "exempt" };
+    return { ...ALL_ON, ...NO_DATES, plan: null, status: null, reason: "exempt" };
   }
 
   const rows = await db
     .select({
+      stripeSubscriptionId: subscriptions.stripeSubscriptionId,
       stripePriceId: subscriptions.stripePriceId,
       status: subscriptions.status,
       currentPeriodEnd: subscriptions.currentPeriodEnd,
+      cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
+      trialEnd: subscriptions.trialEnd,
     })
     .from(subscriptions)
     .where(eq(subscriptions.charityId, charity.id));
 
-  const entitledRows = rows.filter((r) =>
-    ENTITLED_STATUSES.includes(r.status),
+  const entitledRows = rows.filter(
+    (r) => ENTITLED_STATUSES.includes(r.status) && !isStaleTrial(r),
   );
   if (entitledRows.length === 0) {
-    return { ...ALL_OFF, plan: null, status: null, reason: "none" };
+    return {
+      ...ALL_OFF,
+      ...NO_DATES,
+      plan: null,
+      status: null,
+      // Rows existing at all means they subscribed once — a lapse, not a
+      // never-started account. The admin copy differs sharply.
+      reason: rows.length > 0 ? "lapsed" : "none",
+    };
   }
 
   // Union the products of every entitled subscription (normally one row).
   const products = new Set<ProductKey>();
   for (const row of entitledRows) {
-    for (const p of resolvePlan(row.stripePriceId)?.products ?? []) {
-      products.add(p);
+    const plan = resolvePlan(row.stripePriceId);
+    if (!plan) {
+      // A paying subscriber whose price is no longer in the env map would
+      // silently lose everything — loud, because it is always a config bug.
+      console.error(
+        `[billing] entitled subscription ${row.stripeSubscriptionId} has unmapped price ${row.stripePriceId} — add it to the STRIPE_PRICE_* list for its plan`,
+      );
+      continue;
     }
+    for (const p of plan.products) products.add(p);
   }
 
   // Best row for display: healthy statuses first, then latest period end.
@@ -180,7 +267,105 @@ export async function getEntitlementsForCharity(charity: {
     plan: best ? (resolvePlan(best.stripePriceId)?.key ?? null) : null,
     status: best?.status ?? null,
     reason: "subscribed",
+    cancelAtPeriodEnd: best?.cancelAtPeriodEnd ?? false,
+    currentPeriodEnd: best?.currentPeriodEnd ?? null,
+    trialEnd: best?.trialEnd ?? null,
+    trialEndsSoon: trialEndsSoon(best?.status ?? null, best?.trialEnd ?? null),
   };
+}
+
+/**
+ * Bulk variant for list pages (avoids N+1). Returns a map keyed by
+ * charity id.
+ */
+export async function getEntitlementsForCharities(
+  rows: { id: string; billingExempt: boolean }[],
+): Promise<Map<string, Entitlements>> {
+  const map = new Map<string, Entitlements>();
+  if (rows.length === 0) return map;
+
+  if (!isBillingConfigured()) {
+    for (const c of rows) {
+      map.set(c.id, {
+        ...ALL_ON,
+        ...NO_DATES,
+        plan: null,
+        status: null,
+        reason: "unconfigured",
+      });
+    }
+    return map;
+  }
+
+  const subs = await db
+    .select({
+      charityId: subscriptions.charityId,
+      stripeSubscriptionId: subscriptions.stripeSubscriptionId,
+      stripePriceId: subscriptions.stripePriceId,
+      status: subscriptions.status,
+      currentPeriodEnd: subscriptions.currentPeriodEnd,
+      cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
+      trialEnd: subscriptions.trialEnd,
+    })
+    .from(subscriptions)
+    .where(
+      inArray(
+        subscriptions.charityId,
+        rows.map((c) => c.id),
+      ),
+    );
+
+  for (const c of rows) {
+    if (c.billingExempt) {
+      map.set(c.id, {
+        ...ALL_ON,
+        ...NO_DATES,
+        plan: null,
+        status: null,
+        reason: "exempt",
+      });
+      continue;
+    }
+    const mine = subs.filter((s) => s.charityId === c.id);
+    const entitled = mine.filter(
+      (s) => ENTITLED_STATUSES.includes(s.status) && !isStaleTrial(s),
+    );
+    if (entitled.length === 0) {
+      map.set(c.id, {
+        ...ALL_OFF,
+        ...NO_DATES,
+        plan: null,
+        status: null,
+        reason: mine.length > 0 ? "lapsed" : "none",
+      });
+      continue;
+    }
+    const products = new Set<ProductKey>();
+    for (const s of entitled) {
+      const plan = resolvePlan(s.stripePriceId);
+      if (!plan) {
+        console.error(
+          `[billing] entitled subscription ${s.stripeSubscriptionId} has unmapped price ${s.stripePriceId}`,
+        );
+        continue;
+      }
+      for (const p of plan.products) products.add(p);
+    }
+    const best = entitled[0];
+    map.set(c.id, {
+      donorWall: products.has("donorWall"),
+      shop: products.has("shop"),
+      contests: products.has("contests"),
+      plan: resolvePlan(best.stripePriceId)?.key ?? null,
+      status: best.status,
+      reason: "subscribed",
+      cancelAtPeriodEnd: best.cancelAtPeriodEnd,
+      currentPeriodEnd: best.currentPeriodEnd,
+      trialEnd: best.trialEnd,
+      trialEndsSoon: trialEndsSoon(best.status, best.trialEnd),
+    });
+  }
+  return map;
 }
 
 /**
@@ -199,6 +384,11 @@ function subscriptionPeriodEnd(sub: Stripe.Subscription): Date | null {
  * webhook and the checkout-return sync. Idempotent AND ordered: the
  * setWhere stale-event guard means replays are no-ops and an out-of-order
  * older event can never regress newer state.
+ *
+ * CLOCKS: eventCreated must always come from STRIPE's clock (event.created
+ * for webhooks, sub.created for the return-page sync) — never Date.now().
+ * Mixing our wall clock into this column would let a sync stamp a value
+ * ahead of real events and permanently discard them.
  */
 export async function upsertSubscription(
   sub: Stripe.Subscription,
@@ -237,66 +427,4 @@ export async function upsertSubscription(
     .returning({ id: subscriptions.id });
 
   return applied.length > 0 ? "applied" : "stale";
-}
-
-/**
- * Bulk variant used by list pages (avoids N+1). Returns a map keyed by
- * charity id; charities with no entitled subscription map to ALL_OFF
- * (unless billing is off or they're exempt).
- */
-export async function getEntitlementsForCharities(
-  rows: { id: string; billingExempt: boolean }[],
-): Promise<Map<string, Entitlements>> {
-  const map = new Map<string, Entitlements>();
-  if (rows.length === 0) return map;
-
-  if (!isBillingConfigured()) {
-    for (const c of rows) {
-      map.set(c.id, { ...ALL_ON, plan: null, status: null, reason: "unconfigured" });
-    }
-    return map;
-  }
-
-  const subs = await db
-    .select({
-      charityId: subscriptions.charityId,
-      stripePriceId: subscriptions.stripePriceId,
-      status: subscriptions.status,
-    })
-    .from(subscriptions)
-    .where(
-      inArray(
-        subscriptions.charityId,
-        rows.map((c) => c.id),
-      ),
-    );
-
-  for (const c of rows) {
-    if (c.billingExempt) {
-      map.set(c.id, { ...ALL_ON, plan: null, status: null, reason: "exempt" });
-      continue;
-    }
-    const entitled = subs.filter(
-      (s) => s.charityId === c.id && ENTITLED_STATUSES.includes(s.status),
-    );
-    if (entitled.length === 0) {
-      map.set(c.id, { ...ALL_OFF, plan: null, status: null, reason: "none" });
-      continue;
-    }
-    const products = new Set<ProductKey>();
-    for (const s of entitled) {
-      for (const p of resolvePlan(s.stripePriceId)?.products ?? []) {
-        products.add(p);
-      }
-    }
-    map.set(c.id, {
-      donorWall: products.has("donorWall"),
-      shop: products.has("shop"),
-      contests: products.has("contests"),
-      plan: resolvePlan(entitled[0].stripePriceId)?.key ?? null,
-      status: entitled[0].status,
-      reason: "subscribed",
-    });
-  }
-  return map;
 }

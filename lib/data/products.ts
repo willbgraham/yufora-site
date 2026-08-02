@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { and, asc, desc, eq, inArray, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { charities, productPhotos, products } from "@/lib/db/schema";
@@ -65,7 +66,7 @@ export async function getProductForCharity(
  * the embed sits on the charity's own website, and a 404 would punish
  * their visitors. Re-subscribing restores everything instantly.
  */
-export async function getPublicShop(slug: string) {
+export const getPublicShop = cache(async (slug: string) => {
   const rows = await db
     .select()
     .from(charities)
@@ -88,13 +89,23 @@ export async function getPublicShop(slug: string) {
     .orderBy(asc(products.sortOrder), desc(products.createdAt));
 
   return { charity, products: await attachPhotos(items), paused: false };
-}
+});
 
-/** Public product page: only if published and under this slug. */
+/**
+ * Public product page: only if published and under this slug.
+ *
+ * Paused is distinct from missing — a lapsed shop's deep links must render
+ * the same "temporarily unavailable" state as its index, never a 404. The
+ * embed return flow builds these URLs (public/embed.js), so 404ing here
+ * would break the thank-you the pause path exists to protect.
+ */
 export async function getPublicProduct(slug: string, productId: string) {
   const shop = await getPublicShop(slug);
   if (!shop) return null;
+  if (shop.paused) {
+    return { charity: shop.charity, product: null, paused: true as const };
+  }
   const product = shop.products.find((p) => p.id === productId);
   if (!product) return null;
-  return { charity: shop.charity, product };
+  return { charity: shop.charity, product, paused: false as const };
 }

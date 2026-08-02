@@ -14,7 +14,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, id } = await params;
   const data = await getPublicProduct(slug, id);
-  if (!data) return {};
+  if (!data || data.paused) return {};
   return {
     title: `${data.product.title} — ${data.charity.name}`,
     description: `Help fund this for ${data.charity.name}: ${formatCents(data.product.goalCents)}.`,
@@ -26,6 +26,17 @@ export default async function PublicProductPage({ params, searchParams }: Props)
   const { donated } = await searchParams;
   const data = await getPublicProduct(slug, id);
   if (!data) notFound();
+
+  // A lapsed shop pauses rather than 404s — same contract as its index.
+  if (data.paused) {
+    return (
+      <Container className="py-12">
+        <p className="rounded-xl border border-dashed border-warm-300 p-10 text-center text-warm-600">
+          This shop is temporarily unavailable — check back soon.
+        </p>
+      </Container>
+    );
+  }
 
   const { charity, product } = data;
   const donationsOpen =

@@ -23,7 +23,7 @@ export async function GET() {
   // Going live is the paid moment: connecting the live wall needs the
   // donor-wall entitlement.
   if (!(await getEntitlementsForCharity(charity)).donorWall) {
-    redirect("/admin/billing");
+    redirect("/admin/billing?need=donorWall");
   }
 
   const params = new URLSearchParams({

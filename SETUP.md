@@ -177,6 +177,26 @@ Run against the deployed staging environment with a live Connect webhook
 
 ---
 
+## Schema changes: push BEFORE deploying
+
+Drizzle generates explicit column lists, so code that knows about a new
+column fails against a database that doesn't have it yet — *every* query
+on that table, not just the new feature. There are no migration files in
+this repo (`drizzle-kit push` only), so the ordering is manual and matters:
+
+1. `npm run db:push` with `DATABASE_URL` pointed at the target database
+   (each Neon branch separately — preview parent and production).
+2. *Then* push/merge the code.
+
+Additive, nullable/defaulted columns are backward-compatible, so the old
+code keeps running happily between the two steps. Doing it in the other
+order takes the site down until the push lands.
+
+Also required once per Stripe mode: **Settings → Billing → Customer portal
+→ save the default configuration**, in both test and live mode. Without it
+`openBillingPortal` can't create a session (the page degrades to a notice,
+but nobody can self-serve a card update until it's saved).
+
 ## Env var reference
 
 | Variable | Enables | Without it |

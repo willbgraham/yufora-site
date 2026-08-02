@@ -152,7 +152,7 @@ export async function setProductStatus(productId: string, status: string) {
   // Unpublishing and archiving are always allowed.
   if (parsed.data === "published") {
     const entitlements = await getEntitlementsForCharity(charity);
-    if (!entitlements.shop) redirect("/admin/billing");
+    if (!entitlements.shop) redirect("/admin/billing?need=shop");
   }
 
   await db

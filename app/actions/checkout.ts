@@ -64,7 +64,20 @@ export async function startCheckout(
 
   // Entitlement check beside the Stripe-readiness gate: a lapsed shop
   // can't take new donations (its public pages are paused anyway).
-  if (!(await getEntitlementsForCharity(charity)).shop) {
+  // Wrapped so a billing-infrastructure failure returns this action's
+  // designed error state instead of throwing — the donation rail must
+  // never be taken down by the billing subsystem.
+  let shopEntitled: boolean;
+  try {
+    shopEntitled = (await getEntitlementsForCharity(charity)).shop;
+  } catch (err) {
+    console.error("[checkout] entitlement lookup failed", err);
+    return {
+      status: "error",
+      message: "Couldn't start the donation — please try again in a moment.",
+    };
+  }
+  if (!shopEntitled) {
     return { status: "error", message: "Donations aren't open yet for this shop." };
   }
 

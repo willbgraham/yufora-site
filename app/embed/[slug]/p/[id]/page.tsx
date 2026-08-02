@@ -15,6 +15,15 @@ export default async function EmbedProductPage({ params, searchParams }: Props) 
   const data = await getPublicProduct(slug, id);
   if (!data) notFound();
 
+  // Never 404 inside the charity's own website — pause instead.
+  if (data.paused) {
+    return (
+      <p className="rounded-xl border border-dashed border-warm-300 p-10 text-center text-warm-600">
+        This shop is temporarily unavailable — check back soon.
+      </p>
+    );
+  }
+
   const { charity, product } = data;
   const donationsOpen =
     isStripeConfigured() &&

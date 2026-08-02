@@ -112,6 +112,14 @@ export default async function AdminPage() {
           <p className="text-sm text-warm-800">
             {entitlements.reason === "exempt" ? (
               <>Founding plan — every tool included. Thanks for going first.</>
+            ) : entitlements.reason === "lapsed" ? (
+              <>
+                <span className="font-medium text-pink-700">
+                  Your plan has ended.
+                </span>{" "}
+                Your shop and donor wall are paused for visitors — pick a
+                plan to bring them back.
+              </>
             ) : entitlements.status === "past_due" ? (
               <>
                 <span className="font-medium text-pink-700">
@@ -119,8 +127,10 @@ export default async function AdminPage() {
                 </span>{" "}
                 Your tools stay live for now — please update your card.
               </>
+            ) : entitlements.cancelAtPeriodEnd ? (
+              <>Cancellation scheduled — your tools stay live until the end of this billing period.</>
             ) : entitlements.status === "trialing" ? (
-              <>Free trial — everything&rsquo;s live while you try it.</>
+              <>Free trial — your plan&rsquo;s tools are live while you try it.</>
             ) : entitlements.reason === "subscribed" ? (
               <>Plan active. Your tools are live.</>
             ) : (
@@ -151,10 +161,22 @@ export default async function AdminPage() {
             <span aria-hidden="true" className="font-display text-3xl text-pink-200">
               1
             </span>
-            <StepBadge tone={items.length > 0 ? "done" : "todo"}>
-              {items.length > 0
-                ? `${items.length} product${items.length === 1 ? "" : "s"}, ${published} live`
-                : "Start here"}
+            <StepBadge
+              tone={
+                items.length === 0
+                  ? "todo"
+                  : published > 0 && !entitlements.shop
+                    ? "soon"
+                    : "done"
+              }
+            >
+              {items.length === 0
+                ? "Start here"
+                : published > 0 && !entitlements.shop
+                  ? // Rows still say "published", but visitors see a paused
+                    // shop — never claim "live" when it isn't.
+                    `${items.length} product${items.length === 1 ? "" : "s"}, paused`
+                  : `${items.length} product${items.length === 1 ? "" : "s"}, ${published} live`}
             </StepBadge>
           </div>
           <h2 className="mt-3 text-lg text-warm-900">
