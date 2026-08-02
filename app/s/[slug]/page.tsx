@@ -33,7 +33,11 @@ export default async function ShopPage({ params }: Props) {
         </p>
       </header>
 
-      {products.length === 0 ? (
+      {shop.paused ? (
+        <p className="mt-12 rounded-xl border border-dashed border-warm-300 p-10 text-center text-warm-600">
+          This shop is temporarily unavailable — check back soon.
+        </p>
+      ) : products.length === 0 ? (
         <p className="mt-12 rounded-xl border border-dashed border-warm-300 p-10 text-center text-warm-600">
           Nothing here yet — check back soon.
         </p>

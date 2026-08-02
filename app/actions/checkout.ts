@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { charities, products } from "@/lib/db/schema";
 import { parseDollarsToCents } from "@/lib/money";
+import { getEntitlementsForCharity } from "@/lib/billing";
 import { MIN_CONTRIBUTION_CENTS, isStripeConfigured, stripe } from "@/lib/stripe";
 import { siteConfig } from "@/lib/site";
 
@@ -58,6 +59,12 @@ export async function startCheckout(
     !charity.stripeAccountId ||
     !charity.stripeChargesEnabled
   ) {
+    return { status: "error", message: "Donations aren't open yet for this shop." };
+  }
+
+  // Entitlement check beside the Stripe-readiness gate: a lapsed shop
+  // can't take new donations (its public pages are paused anyway).
+  if (!(await getEntitlementsForCharity(charity)).shop) {
     return { status: "error", message: "Donations aren't open yet for this shop." };
   }
 

@@ -15,7 +15,11 @@ export default async function EmbedShopPage({ params }: Props) {
 
   return (
     <div>
-      {products.length === 0 ? (
+      {shop.paused ? (
+        <p className="rounded-xl border border-dashed border-warm-300 p-10 text-center text-warm-600">
+          This shop is temporarily unavailable — check back soon.
+        </p>
+      ) : products.length === 0 ? (
         <p className="rounded-xl border border-dashed border-warm-300 p-10 text-center text-warm-600">
           Nothing here yet — check back soon.
         </p>

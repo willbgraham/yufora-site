@@ -3,6 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { charities, wallEntries } from "@/lib/db/schema";
 import { isStripeConfigured, stripe } from "@/lib/stripe";
+import { getEntitlementsForCharity } from "@/lib/billing";
 
 export type TickerItem = { amountCents: number; createdAt: Date };
 
@@ -29,6 +30,20 @@ export async function getTickerData(slug: string): Promise<TickerData | null> {
     await db.select().from(charities).where(eq(charities.slug, slug)).limit(1)
   )[0];
   if (!charity) return null;
+
+  // Entitlement gate — the embed route is unauthenticated, so this is the
+  // only gate it can rely on. Lapsed = a quiet empty widget, never broken.
+  const entitlements = await getEntitlementsForCharity(charity);
+  if (!entitlements.donorWall) {
+    return {
+      charityName: charity.name,
+      connected: false,
+      items: [],
+      monthTotalCents: 0,
+      monthCount: 0,
+      recognized: [],
+    };
+  }
 
   const recognized = (
     await db

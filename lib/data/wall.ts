@@ -2,6 +2,7 @@ import "server-only";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { charities, contributions, products } from "@/lib/db/schema";
+import { getEntitlementsForCharity } from "@/lib/billing";
 
 export type WallEntry = {
   /** Null when the donor chose anonymity. */
@@ -29,6 +30,11 @@ export async function getRecentWall(slug: string): Promise<WallEntry[] | null> {
     await db.select().from(charities).where(eq(charities.slug, slug)).limit(1)
   )[0];
   if (!charity) return null;
+
+  // These walls render contribution data from the wishlist shop — same
+  // unauthenticated-embed entitlement gate as getPublicShop. Lapsed =
+  // empty wall, never broken.
+  if (!(await getEntitlementsForCharity(charity)).shop) return [];
 
   const rows = await db
     .select({
@@ -68,6 +74,8 @@ export async function getTopWall(slug: string): Promise<TopSupporter[] | null> {
     await db.select().from(charities).where(eq(charities.slug, slug)).limit(1)
   )[0];
   if (!charity) return null;
+
+  if (!(await getEntitlementsForCharity(charity)).shop) return [];
 
   const rows = await db
     .select({

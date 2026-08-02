@@ -113,6 +113,20 @@ export const charities = pgTable(
      * shop's account) so the two products never interfere.
      */
     tickerStripeAccountId: text("ticker_stripe_account_id"),
+    /**
+     * The charity as OUR paying customer (cus_..., on the PLATFORM Stripe
+     * account). A charity now has three distinct Stripe identities — do
+     * not confuse them:
+     *  - stripeAccountId: their Connect account that RECEIVES donations
+     *  - tickerStripeAccountId: read-only OAuth to their existing account
+     *  - stripeCustomerId: them PAYING Yufora for the subscription
+     */
+    stripeCustomerId: text("stripe_customer_id"),
+    /**
+     * Staff comp lever: fully entitled without a subscription. Used for
+     * founding/early-access organizations.
+     */
+    billingExempt: boolean("billing_exempt").notNull().default(false),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()
@@ -224,6 +238,56 @@ export const contributions = pgTable(
     index("contributions_product_idx").on(t.productId),
     index("contributions_charity_idx").on(t.charityId),
   ],
+);
+
+/* ---------------------------------------------------------------------------
+   Billing — the charity's subscription to Yufora itself (PLATFORM Stripe
+   account; entirely separate from the donation rails above).
+--------------------------------------------------------------------------- */
+
+export type SubscriptionStatus =
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "unpaid"
+  | "incomplete"
+  | "incomplete_expired"
+  | "paused";
+
+/**
+ * One row per Stripe Subscription, keyed by the Stripe id — NOT columns on
+ * charities. A charity that cancels and later resubscribes gets a new
+ * sub_... id, and Stripe delivers webhooks unordered and retried: a late
+ * event for the old, canceled subscription must never clobber the new
+ * one's status. Each Stripe subscription upserts its own row; entitlement
+ * reads "does any entitled row exist" (see lib/billing.ts).
+ */
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    id: id(),
+    charityId: text("charity_id")
+      .notNull()
+      .references(() => charities.id, { onDelete: "cascade" }),
+    stripeCustomerId: text("stripe_customer_id").notNull(),
+    /** Upsert key: webhook replays and out-of-order deliveries collapse here. */
+    stripeSubscriptionId: text("stripe_subscription_id").notNull().unique(),
+    /** Resolved to a plan at READ time via the env map — never stored as a name. */
+    stripePriceId: text("stripe_price_id").notNull(),
+    status: text("status").$type<SubscriptionStatus>().notNull(),
+    currentPeriodEnd: timestamp("current_period_end"),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+    trialEnd: timestamp("trial_end"),
+    /** Unix seconds of the newest Stripe event applied — stale-event guard. */
+    lastEventCreated: integer("last_event_created").notNull().default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [index("subscriptions_charity_idx").on(t.charityId)],
 );
 
 /* ---------------------------------------------------------------------------

@@ -190,4 +190,7 @@ Run against the deployed staging environment with a live Connect webhook
 | `AUTH_EMAIL_FROM` / `DONOR_EMAIL_FROM` | Optional per-purpose from addresses | Fall back to `LEAD_NOTIFY_FROM` |
 | `STRIPE_SECRET_KEY` | Connect onboarding + checkout | Fund buttons disabled, "Donations open soon" |
 | `STRIPE_WEBHOOK_SECRET` | Recording donations, refunds, account sync | Webhook returns 503 and refuses unsigned events |
+| `STRIPE_PRICE_DONOR_WALL` / `STRIPE_PRICE_SHOP` / `STRIPE_PRICE_CONTESTS` / `STRIPE_PRICE_EVERYTHING` | Yufora subscription billing (plan → Stripe Price map) | Billing off — every charity fully entitled (pre-billing behavior) |
+| `STRIPE_BILLING_WEBHOOK_SECRET` | Subscription status sync (separate endpoint: `/api/webhooks/stripe-billing`, "events on your account") | Billing webhook returns 503; return-page sync still works |
+| `BILLING_TRIAL_DAYS` | Free live trial length (no card required) | No trial — plans charge at checkout |
 | `NEXT_PUBLIC_ALLOW_INDEXING` | Search engines may index | robots.txt disallows everything (correct for staging) |

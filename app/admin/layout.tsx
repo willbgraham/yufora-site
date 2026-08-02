@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Container from "@/components/layout/Container";
 import SignOutButton from "@/components/admin/SignOutButton";
+import { getEntitlementsForCharity } from "@/lib/billing";
+import { getCharityForUser } from "@/lib/data/charity";
 import { requireSession, isStaffEmail } from "@/lib/session";
 
 export const metadata: Metadata = {
@@ -17,6 +19,14 @@ export default async function AdminLayout({
 }) {
   const session = await requireSession();
   const staff = isStaffEmail(session.user.email);
+
+  // Payment-trouble banner: past_due keeps everything live (Stripe's
+  // dunning is the grace period), but the owner should hear about it on
+  // every admin page, not just the dashboard.
+  const charity = await getCharityForUser(session.user.id);
+  const pastDue = charity
+    ? (await getEntitlementsForCharity(charity)).status === "past_due"
+    : false;
 
   return (
     <div className="flex min-h-screen flex-col bg-warm-50">
@@ -60,6 +70,24 @@ export default async function AdminLayout({
           </div>
         </Container>
       </header>
+      {pastDue && (
+        <div className="border-b border-pink-200 bg-pink-50">
+          <Container className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+            <p className="text-warm-800">
+              <span className="font-medium text-pink-700">
+                Your last payment didn&rsquo;t go through.
+              </span>{" "}
+              Everything stays live for now — please update your card.
+            </p>
+            <Link
+              href="/admin/billing"
+              className="font-medium text-pink-700 hover:underline"
+            >
+              Fix payment →
+            </Link>
+          </Container>
+        </div>
+      )}
       <main id="main" className="flex-1 py-10">
         <Container>{children}</Container>
       </main>

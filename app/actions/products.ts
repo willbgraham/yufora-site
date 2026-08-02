@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { productPhotos, products } from "@/lib/db/schema";
 import { getCharityForUser } from "@/lib/data/charity";
 import { getProductForCharity } from "@/lib/data/products";
+import { getEntitlementsForCharity } from "@/lib/billing";
 import { parseDollarsToCents } from "@/lib/money";
 import { parseVideoUrl } from "@/lib/video";
 import {
@@ -146,6 +147,13 @@ export async function setProductStatus(productId: string, status: string) {
   const charity = await requireCharity();
   const parsed = statusSchema.safeParse(status);
   if (!parsed.success) return;
+
+  // Going live is the paid moment: publishing needs the shop entitlement.
+  // Unpublishing and archiving are always allowed.
+  if (parsed.data === "published") {
+    const entitlements = await getEntitlementsForCharity(charity);
+    if (!entitlements.shop) redirect("/admin/billing");
+  }
 
   await db
     .update(products)

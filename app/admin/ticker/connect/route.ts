@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { getCharityForUser } from "@/lib/data/charity";
+import { getEntitlementsForCharity } from "@/lib/billing";
 import { siteConfig } from "@/lib/site";
 
 /**
@@ -18,6 +19,12 @@ export async function GET() {
 
   const clientId = process.env.STRIPE_CONNECT_CLIENT_ID;
   if (!clientId) redirect("/admin");
+
+  // Going live is the paid moment: connecting the live wall needs the
+  // donor-wall entitlement.
+  if (!(await getEntitlementsForCharity(charity)).donorWall) {
+    redirect("/admin/billing");
+  }
 
   const params = new URLSearchParams({
     response_type: "code",

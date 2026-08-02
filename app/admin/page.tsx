@@ -5,6 +5,7 @@ import EmbedPageUrlForm from "@/components/admin/EmbedPageUrlForm";
 import EmbedSnippet from "@/components/admin/EmbedSnippet";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/site";
+import { getEntitlementsForCharity, isBillingConfigured } from "@/lib/billing";
 import { getCharityForUser } from "@/lib/data/charity";
 import { getTotalsForCharity } from "@/lib/data/contributions";
 import { getProductsForCharity } from "@/lib/data/products";
@@ -48,9 +49,10 @@ export default async function AdminPage() {
     );
   }
 
-  const [items, totals] = await Promise.all([
+  const [items, totals, entitlements] = await Promise.all([
     getProductsForCharity(charity.id),
     getTotalsForCharity(charity.id),
+    getEntitlementsForCharity(charity),
   ]);
   const published = items.filter((p) => p.status === "published").length;
 
@@ -97,6 +99,47 @@ export default async function AdminPage() {
           </Link>
         )}
       </div>
+
+      {/* Plan strip — only when billing exists. Free-to-build, pay to go live. */}
+      {isBillingConfigured() && (
+        <div
+          className={`mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-5 py-3.5 ${
+            entitlements.status === "past_due"
+              ? "border-pink-200 bg-pink-50"
+              : "border-warm-200 bg-white"
+          }`}
+        >
+          <p className="text-sm text-warm-800">
+            {entitlements.reason === "exempt" ? (
+              <>Founding plan — every tool included. Thanks for going first.</>
+            ) : entitlements.status === "past_due" ? (
+              <>
+                <span className="font-medium text-pink-700">
+                  Payment issue.
+                </span>{" "}
+                Your tools stay live for now — please update your card.
+              </>
+            ) : entitlements.status === "trialing" ? (
+              <>Free trial — everything&rsquo;s live while you try it.</>
+            ) : entitlements.reason === "subscribed" ? (
+              <>Plan active. Your tools are live.</>
+            ) : (
+              <>
+                Free while you build. When you&rsquo;re ready to publish,
+                pick a plan.
+              </>
+            )}
+          </p>
+          <Link
+            href="/admin/billing"
+            className="text-sm font-medium text-pink-700 hover:underline"
+          >
+            {entitlements.reason === "subscribed" || entitlements.reason === "exempt"
+              ? "Manage billing →"
+              : "See plans →"}
+          </Link>
+        </div>
+      )}
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         {/* Step 1 — products */}

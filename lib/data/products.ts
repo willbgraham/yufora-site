@@ -2,6 +2,7 @@ import "server-only";
 import { and, asc, desc, eq, inArray, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { charities, productPhotos, products } from "@/lib/db/schema";
+import { getEntitlementsForCharity } from "@/lib/billing";
 
 export type ProductWithPhotos = typeof products.$inferSelect & {
   photos: (typeof productPhotos.$inferSelect)[];
@@ -55,7 +56,15 @@ export async function getProductForCharity(
   return withPhotos;
 }
 
-/** Public shop: charity by slug plus its published products. */
+/**
+ * Public shop: charity by slug plus its published products.
+ *
+ * Entitlement gate lives HERE because /s/[slug] and /embed/[slug] are
+ * unauthenticated — this is the only gate they can rely on. A lapsed
+ * subscription pauses the shop (empty list + flag), never breaks it:
+ * the embed sits on the charity's own website, and a 404 would punish
+ * their visitors. Re-subscribing restores everything instantly.
+ */
 export async function getPublicShop(slug: string) {
   const rows = await db
     .select()
@@ -65,6 +74,11 @@ export async function getPublicShop(slug: string) {
   const charity = rows[0];
   if (!charity) return null;
 
+  const entitlements = await getEntitlementsForCharity(charity);
+  if (!entitlements.shop) {
+    return { charity, products: [] as ProductWithPhotos[], paused: true };
+  }
+
   const items = await db
     .select()
     .from(products)
@@ -73,7 +87,7 @@ export async function getPublicShop(slug: string) {
     )
     .orderBy(asc(products.sortOrder), desc(products.createdAt));
 
-  return { charity, products: await attachPhotos(items) };
+  return { charity, products: await attachPhotos(items), paused: false };
 }
 
 /** Public product page: only if published and under this slug. */
