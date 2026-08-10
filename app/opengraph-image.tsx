@@ -49,7 +49,7 @@ export default function OpengraphImage() {
               maxWidth: 900,
             }}
           >
-            Show your donors exactly what you need.
+            Films and fundraising tools for nonprofits.
           </div>
           <div
             style={{
@@ -59,8 +59,8 @@ export default function OpengraphImage() {
               maxWidth: 860,
             }}
           >
-            A wishlist shop and referral contests that run on your own
-            website.
+            Short documentaries, a wishlist shop, and a live donor wall —
+            on your own website.
           </div>
         </div>
         <div

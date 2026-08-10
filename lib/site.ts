@@ -1,8 +1,8 @@
 export const siteConfig = {
   name: "Yufora",
-  tagline: "Show your donors exactly what you need.",
+  tagline: "Films and fundraising tools for nonprofits.",
   description:
-    "Yufora gives nonprofits a wishlist shop and referral contests that run on their own website — with the money going straight into their own account.",
+    "Yufora makes short documentaries for nonprofits — plus a wishlist shop, live donor wall, and referral contests that run on your own website, with the money going straight into your own account.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   email: "hello@yufora.com",
 } as const;
