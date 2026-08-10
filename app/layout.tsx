@@ -1,18 +1,25 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Figtree } from "next/font/google";
+import localFont from "next/font/local";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
-const inter = Inter({
+const figtree = Figtree({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-figtree",
 });
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
+/**
+ * Libertinus Math (SIL OFL, self-hosted — not on Google Fonts), subset
+ * to Latin so the display face costs 25KB instead of 396KB of math
+ * glyphs. Single weight; headings pin font-weight 400 in globals.css.
+ */
+const libertinus = localFont({
+  src: "./fonts/LibertinusMath-Regular.woff2",
+  weight: "400",
   display: "swap",
-  variable: "--font-fraunces",
+  variable: "--font-display-serif",
 });
 
 export const metadata: Metadata = {
@@ -41,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${figtree.variable} ${libertinus.variable}`}>
       <body>{children}</body>
     </html>
   );
