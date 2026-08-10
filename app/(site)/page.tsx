@@ -141,8 +141,47 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* 5 — Quiet tools line */}
-      <Section tone="tint">
+      {/* 5 — We measure what the film moves */}
+      <Section tone="tint" labelledBy="measure-heading">
+        <div className="grid gap-10 lg:grid-cols-2">
+          <div>
+            <h2 id="measure-heading" className="text-3xl sm:text-4xl">
+              We measure what the film moves.
+            </h2>
+            <p className="mt-4 text-lg text-warm-700">
+              Film companies show you a reel and an award shelf, and that&rsquo;s
+              where it ends. We keep watching after delivery: the links your
+              film runs behind get tagged, and sixty days in you get a one-page
+              results sheet — how the giving page it opens converted, how the
+              appeal it anchored got clicked, before and after.
+            </p>
+            <p className="mt-4 text-warm-700">
+              We commit to measuring honestly, not to inventing a lift number.
+              If the film moved nothing, the sheet says so — and we&rsquo;ll be
+              the first ones asking why.
+            </p>
+          </div>
+          <ul className="space-y-3 self-center">
+            {[
+              ["Tagged links", "every placement of your film carries its own link, so results are attributable — not guessed"],
+              ["Before and after", "the same page, the same audience, compared across the film going live"],
+              ["A one-page results sheet", "sixty days in: what the film ran behind, what changed, in plain English"],
+              ["Honest comparisons", "measured against your own baseline — never a December spike sold as skill"],
+            ].map(([title, body]) => (
+              <li
+                key={title}
+                className="rounded-lg border border-warm-200 bg-white px-5 py-3.5"
+              >
+                <span className="font-medium text-warm-900">{title}</span>{" "}
+                <span className="text-warm-700">— {body}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+
+      {/* 6 — Quiet tools line */}
+      <Section>
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-lg text-warm-700">
             A film gives someone a reason to give. When you&rsquo;re ready, the
@@ -161,7 +200,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* 6 — Final CTA */}
+      {/* 7 — Final CTA */}
       <Section tone="dark" labelledBy="cta-heading">
         <div className="mx-auto max-w-2xl text-center">
           <h2 id="cta-heading" className="text-3xl text-white sm:text-4xl">
