@@ -86,8 +86,11 @@
   h2,
   h3 {
     font-family: var(--font-display);
+    /* Instrument Serif ships one weight — explicit 400 stops the browser
+       from faux-bolding headings (and the light weight IS the look). */
+    font-weight: 400;
     color: var(--color-warm-900);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     text-wrap: balance;
   }
 

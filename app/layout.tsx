@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Instrument_Serif, Inter } from "next/font/google";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -9,8 +9,11 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const fraunces = Fraunces({
+// Canela-adjacent: contemporary flared serif, calm and editorial.
+// (Canela itself is a commercial license — this is the free stand-in.)
+const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
+  weight: "400",
   display: "swap",
   variable: "--font-fraunces",
 });
@@ -41,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
       <body>{children}</body>
     </html>
   );
