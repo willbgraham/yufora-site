@@ -60,7 +60,7 @@ export default function ContestsPage() {
         <SectionHeading
           id="c-rules"
           eyebrow="The rules, handled"
-          title="You pick how winning works. We keep it legal."
+          title="You pick how winning works."
           lead="A giveaway with free entry is a sweepstakes, and sweepstakes have rules. Yufora generates the Official Rules for your contest and builds the mechanics that keep you inside them."
         />
         <div className="mt-10">
