@@ -6,6 +6,7 @@ import Steps from "@/components/marketing/Steps";
 import CTABand from "@/components/marketing/CTABand";
 import { ButtonLink } from "@/components/ui/Button";
 import Eyebrow from "@/components/marketing/Eyebrow";
+import ShopDemo from "@/components/marketing/ShopDemo";
 import { PRODUCT_CTA_HREF, PRODUCT_CTA_LABEL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -18,18 +19,22 @@ export default function ShopPage() {
   return (
     <>
       <Section tone="tint">
-        <div className="max-w-3xl">
-          <Eyebrow>The wishlist shop</Eyebrow>
-          <h1 className="text-[length:var(--text-display)] leading-[1.08]">
-            Publish what you need. Let donors fund it.
-          </h1>
-          <p className="mt-6 text-xl text-warm-700">
-            Instead of asking for “support,” show your donors the actual things
-            your work depends on — and let them buy one, or chip in toward one.
-          </p>
-          <ButtonLink href={PRODUCT_CTA_HREF} size="lg" className="mt-8">
-            {PRODUCT_CTA_LABEL}
-          </ButtonLink>
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div>
+            <Eyebrow>The wishlist shop</Eyebrow>
+            <h1 className="text-[length:var(--text-display)] leading-[1.08]">
+              Publish what you need. Let donors fund it.
+            </h1>
+            <p className="mt-6 text-xl text-warm-700">
+              Instead of asking for “support,” show your donors the actual
+              things your work depends on — and let them buy one, or chip in
+              toward one.
+            </p>
+            <ButtonLink href={PRODUCT_CTA_HREF} size="lg" className="mt-8">
+              {PRODUCT_CTA_LABEL}
+            </ButtonLink>
+          </div>
+          <ShopDemo className="mx-auto w-full max-w-lg lg:max-w-none" />
         </div>
       </Section>
 
