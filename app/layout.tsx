@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Inter } from "next/font/google";
+import { Figtree } from "next/font/google";
+import localFont from "next/font/local";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
-const inter = Inter({
+const figtree = Figtree({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-figtree",
 });
 
-// Canela-adjacent: contemporary flared serif, calm and editorial.
-// (Canela itself is a commercial license — this is the free stand-in.)
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
+/**
+ * Libertinus Math (SIL OFL, self-hosted — not on Google Fonts), subset
+ * to Latin so the display face costs 25KB instead of 396KB of math
+ * glyphs. Single weight; headings pin font-weight 400 in globals.css.
+ */
+const libertinus = localFont({
+  src: "./fonts/LibertinusMath-Regular.woff2",
   weight: "400",
   display: "swap",
-  variable: "--font-fraunces",
+  variable: "--font-display-serif",
 });
 
 export const metadata: Metadata = {
@@ -44,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
+    <html lang="en" className={`${figtree.variable} ${libertinus.variable}`}>
       <body>{children}</body>
     </html>
   );

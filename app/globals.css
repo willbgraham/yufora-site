@@ -46,8 +46,8 @@
   --color-teal-900: #0f3d37;
 
   /* Typography */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
 
   /* Fluid display sizes — scale smoothly instead of stepping at breakpoints */
   --text-display: clamp(2.25rem, 5.5vw, 3.5rem);
