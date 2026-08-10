@@ -1,0 +1,100 @@
+import "server-only";
+import { and, desc, eq, sql } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { charities, contributions, products } from "@/lib/db/schema";
+import { getEntitlementsForCharity } from "@/lib/billing";
+
+export type WallEntry = {
+  /** Null when the donor chose anonymity. */
+  name: string | null;
+  /** Null unless the donor explicitly allowed showing the amount. */
+  amountCents: number | null;
+  productTitle: string;
+  createdAt: Date;
+};
+
+export type TopSupporter = {
+  name: string;
+  totalCents: number;
+};
+
+const RECENT_LIMIT = 12;
+const TOP_LIMIT = 10;
+
+/**
+ * Recent supporters — every successful gift, rendered only as generously as
+ * each donor permitted: name, name+amount, or "Someone".
+ */
+export async function getRecentWall(slug: string): Promise<WallEntry[] | null> {
+  const charity = (
+    await db.select().from(charities).where(eq(charities.slug, slug)).limit(1)
+  )[0];
+  if (!charity) return null;
+
+  // These walls render contribution data from the wishlist shop — same
+  // unauthenticated-embed entitlement gate as getPublicShop. Lapsed =
+  // empty wall, never broken.
+  if (!(await getEntitlementsForCharity(charity)).shop) return [];
+
+  const rows = await db
+    .select({
+      donorName: contributions.donorName,
+      amountCents: contributions.amountCents,
+      displayPreference: contributions.displayPreference,
+      createdAt: contributions.createdAt,
+      productTitle: products.title,
+    })
+    .from(contributions)
+    .innerJoin(products, eq(contributions.productId, products.id))
+    .where(
+      and(
+        eq(contributions.charityId, charity.id),
+        eq(contributions.status, "succeeded"),
+      ),
+    )
+    .orderBy(desc(contributions.createdAt))
+    .limit(RECENT_LIMIT);
+
+  return rows.map((r) => ({
+    name:
+      r.displayPreference === "anonymous" ? null : (r.donorName?.trim() || null),
+    amountCents:
+      r.displayPreference === "name_amount" ? r.amountCents : null,
+    productTitle: r.productTitle,
+    createdAt: r.createdAt,
+  }));
+}
+
+/**
+ * Top supporters — only donors who allowed name AND amount, aggregated
+ * across their gifts.
+ */
+export async function getTopWall(slug: string): Promise<TopSupporter[] | null> {
+  const charity = (
+    await db.select().from(charities).where(eq(charities.slug, slug)).limit(1)
+  )[0];
+  if (!charity) return null;
+
+  if (!(await getEntitlementsForCharity(charity)).shop) return [];
+
+  const rows = await db
+    .select({
+      name: contributions.donorName,
+      totalCents: sql<number>`SUM(${contributions.amountCents})`,
+    })
+    .from(contributions)
+    .where(
+      and(
+        eq(contributions.charityId, charity.id),
+        eq(contributions.status, "succeeded"),
+        eq(contributions.displayPreference, "name_amount"),
+      ),
+    )
+    .groupBy(contributions.donorName, contributions.donorEmail)
+    .orderBy(sql`SUM(${contributions.amountCents}) DESC`)
+    .limit(TOP_LIMIT);
+
+  return rows
+    .filter((r) => r.name?.trim())
+    .map((r) => ({ name: r.name!.trim(), totalCents: Number(r.totalCents) }));
+}
