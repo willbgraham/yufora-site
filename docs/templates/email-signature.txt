@@ -37,4 +37,10 @@
     <span style="color: #9C8D93;">&nbsp;&middot;&nbsp;</span>
     <a href="mailto:william@yufora.com" style="color: #D01047;">william@yufora.com</a>
   </p>
+  <!-- CAN-SPAM: replace the placeholder with Yufora's real mailing address
+       before saving. Apollo has no separate address field — this line in the
+       mailbox signature IS the compliance address. -->
+  <p style="margin: 6px 0 0; font-size: 12px; color: #9C8D93;">
+    Yufora, LLC &middot; [street address], [city], [state] [zip]
+  </p>
 </div>
