@@ -1,37 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import Section from "@/components/layout/Section";
 import { Button } from "@/components/ui/Button";
-import { authClient } from "@/lib/auth-client";
+import { requestMagicLink, type SignInState } from "@/app/actions/signin";
+import { HONEYPOT_FIELD } from "@/lib/schema";
+
+const initial: SignInState = { status: "idle" };
 
 export default function SignInPage() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
-    "idle",
-  );
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("sending");
-    const { error } = await authClient.signIn.magicLink({
-      email,
-      callbackURL: "/admin",
-    });
-    setStatus(error ? "error" : "sent");
-  }
+  const [state, formAction, pending] = useActionState(requestMagicLink, initial);
+  const [startedAt] = useState(() => Date.now());
 
   return (
     <Section>
       <div className="mx-auto max-w-md">
         <h1 className="text-3xl sm:text-4xl">Sign in</h1>
 
-        {status === "sent" ? (
+        {state.status === "sent" ? (
           <div className="mt-8 rounded-lg border border-teal-100 bg-teal-50 p-6">
             <p className="font-medium text-teal-900">Check your email.</p>
             <p className="mt-2 text-warm-700">
-              We sent a sign-in link to <strong>{email}</strong>. It expires
-              shortly and can only be used once.
+              We sent a sign-in link to <strong>{state.email}</strong>. It
+              expires shortly and can only be used once.
             </p>
           </div>
         ) : (
@@ -41,7 +32,24 @@ export default function SignInPage() {
               signs you in — or creates your account if you&rsquo;re new. No
               password either way.
             </p>
-            <form onSubmit={onSubmit} className="mt-8 space-y-4">
+            <form action={formAction} className="mt-8 space-y-4" noValidate>
+              <input type="hidden" name="startedAt" value={startedAt} />
+
+              {/* Honeypot. Not type="hidden" — bots skip those. */}
+              <div
+                aria-hidden="true"
+                className="absolute left-[-9999px] h-0 w-0 overflow-hidden"
+              >
+                <label htmlFor={`signin-${HONEYPOT_FIELD}`}>Website</label>
+                <input
+                  id={`signin-${HONEYPOT_FIELD}`}
+                  name={HONEYPOT_FIELD}
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
               <div>
                 <label
                   htmlFor="email"
@@ -51,28 +59,27 @@ export default function SignInPage() {
                 </label>
                 <input
                   id="email"
+                  name="email"
                   type="email"
                   required
                   autoComplete="email"
                   inputMode="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   className="mt-1.5 w-full rounded-md border border-warm-300 bg-white px-3.5 py-2.5 text-base text-warm-900 focus:border-pink-600"
                 />
               </div>
-              {status === "error" && (
+              {state.status === "error" && (
                 <p role="alert" className="text-sm text-pink-700">
-                  Couldn&rsquo;t send the link. Please try again, or email
-                  hello@yufora.com.
+                  Couldn&rsquo;t send the link. Please check the address and
+                  try again, or email hello@yufora.com.
                 </p>
               )}
               <Button
                 type="submit"
                 size="lg"
-                disabled={status === "sending"}
+                disabled={pending}
                 className="w-full"
               >
-                {status === "sending" ? "Sending…" : "Email me a sign-in link"}
+                {pending ? "Sending…" : "Email me a sign-in link"}
               </Button>
             </form>
           </>

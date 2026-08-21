@@ -2,6 +2,7 @@ import {
   pgTable,
   text,
   integer,
+  bigint,
   boolean,
   timestamp,
   index,
@@ -65,6 +66,23 @@ export const account = pgTable(
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (t) => [index("account_user_id_idx").on(t.userId)],
+);
+
+/**
+ * Better Auth rate limiting (storage: "database") — persistent per-IP
+ * counters so throttling holds across serverless instances. Added after
+ * bots probed the magic-link endpoint (2026-08); shape is Better Auth's
+ * rateLimit model: key, count, lastRequest (ms epoch).
+ */
+export const rateLimit = pgTable(
+  "rate_limit",
+  {
+    id: id(),
+    key: text("key"),
+    count: integer("count"),
+    lastRequest: bigint("last_request", { mode: "number" }),
+  },
+  (t) => [index("rate_limit_key_idx").on(t.key)],
 );
 
 export const verification = pgTable("verification", {

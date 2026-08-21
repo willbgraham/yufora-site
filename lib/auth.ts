@@ -23,6 +23,31 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
   // Passwordless only: magic links are the sole sign-in method.
   emailAndPassword: { enabled: false },
+  /**
+   * Bots probe the magic-link endpoint (each request = a real Resend
+   * send, so unthrottled abuse can exhaust the email quota and hurt
+   * send.yufora.com's reputation). Database-backed so counts survive
+   * across serverless instances. Runs in production only (Better Auth
+   * default), which also keeps local dev's PGlite schema-free.
+   *
+   * The signin FORM goes through the requestMagicLink server action
+   * (honeypot + timing); this limiter covers direct HTTP posts.
+   */
+  rateLimit: {
+    window: 60,
+    max: 60,
+    storage: "database",
+    customRules: {
+      // A human signs in once, maybe twice. 3 per 5 minutes per IP.
+      "/sign-in/magic-link": { window: 300, max: 3 },
+    },
+  },
+  advanced: {
+    ipAddress: {
+      // Vercel sets x-forwarded-for at the edge; first value = client.
+      ipAddressHeaders: ["x-forwarded-for", "x-real-ip"],
+    },
+  },
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url }) => {
