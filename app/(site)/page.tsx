@@ -63,8 +63,9 @@ export default function Home() {
             Featured film
           </h2>
           <p className="mt-4 text-lg text-warm-700">
-            Shot on location, cut short, and built to open a campaign.
-            Here&rsquo;s one we made.
+            Numbers ask people to think. A film lets them feel the work —
+            which is what moves someone from reading about it to giving to
+            it. Press play: three minutes with the people a nonprofit serves.
           </p>
         </div>
         <div className="mx-auto mt-10 max-w-4xl overflow-hidden rounded-xl bg-warm-950 shadow-lg ring-1 ring-warm-200">
@@ -92,15 +93,15 @@ export default function Home() {
             steps={[
               {
                 title: "We learn your story",
-                body: "A short call to find the moment worth filming — the family, the project, the turning point from this year.",
+                body: "A short call to find the moment worth filming — the family, the project, the turning point. The people you serve are the story; your work is why it turns.",
               },
               {
                 title: "We film with you",
-                body: "A day or two on the ground with your team and the people you serve. Minimal disruption, real footage.",
+                body: "A day or two on the ground with a small crew that's easy to have around. Real moments, not staged ones — and nothing for you to schedule, produce, or worry about.",
               },
               {
                 title: "You get your film",
-                body: "A short documentary ready for the top of a campaign page, an appeal email, or your socials — plus cutdowns for each.",
+                body: "A short documentary ready for the top of your campaign page, your appeal email, your socials — captioned, cut for every format, and built to keep working for years, not one season.",
               },
             ]}
           />
