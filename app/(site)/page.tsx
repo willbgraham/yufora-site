@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Yufora — Short documentaries for nonprofits",
     description:
-      "We see the work you do — so will your donors. Short documentaries for nonprofits, shot on location.",
+      "Showcase your work — short documentaries for nonprofits, shot on location.",
   },
 };
 
@@ -30,7 +30,7 @@ export default function Home() {
           <div>
             <Eyebrow>Yufora Films</Eyebrow>
             <h1 className="text-[length:var(--text-display)] leading-[1.08] text-white">
-              We see the work you do. So will your donors.
+              Showcase your work.
             </h1>
             <p className="mt-6 text-xl text-warm-300">
               A small crew, a day or two on location, and a short documentary
