@@ -5,7 +5,7 @@ import HeroLoopVideo from "@/components/marketing/HeroLoopVideo";
 import Steps from "@/components/marketing/Steps";
 import Eyebrow from "@/components/marketing/Eyebrow";
 import { ButtonLink } from "@/components/ui/Button";
-import { CTA_HREF, BOOK_CALL_URL } from "@/lib/site";
+import { CTA_HREF } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: { absolute: "Yufora — Short documentaries for nonprofits" },
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Yufora — Short documentaries for nonprofits",
     description:
-      "We film the real work; you raise the money. Short documentaries for nonprofits, shot on location.",
+      "We see the work you do — so will your donors. Short documentaries for nonprofits, shot on location.",
   },
 };
 
@@ -30,7 +30,7 @@ export default function Home() {
           <div>
             <Eyebrow>Yufora Films</Eyebrow>
             <h1 className="text-[length:var(--text-display)] leading-[1.08] text-white">
-              We film the real work. You raise the money.
+              We see the work you do. So will your donors.
             </h1>
             <p className="mt-6 text-xl text-warm-300">
               A small crew, a day or two on location, and a short documentary
@@ -200,29 +200,6 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* 7 — Final CTA */}
-      <Section tone="dark" labelledBy="cta-heading">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 id="cta-heading" className="text-3xl text-white sm:text-4xl">
-            Bring us on location.
-          </h2>
-          <p className="mt-4 text-lg text-warm-300">
-            Tell us where the work happens and who it&rsquo;s for. We&rsquo;ll
-            spend a day or two there and cut you a film — plus the pieces to
-            share it.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <ButtonLink href={CTA_HREF} size="lg">
-              Start a project
-            </ButtonLink>
-            {BOOK_CALL_URL && (
-              <ButtonLink href={BOOK_CALL_URL} size="lg" variant="secondary">
-                Book a call
-              </ButtonLink>
-            )}
-          </div>
-        </div>
-      </Section>
     </>
   );
 }
