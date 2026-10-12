@@ -210,7 +210,10 @@ but nobody can self-serve a card update until it's saved).
 | `AUTH_EMAIL_FROM` / `DONOR_EMAIL_FROM` | Optional per-purpose from addresses | Fall back to `LEAD_NOTIFY_FROM` |
 | `STRIPE_SECRET_KEY` | Connect onboarding + checkout | Fund buttons disabled, "Donations open soon" |
 | `STRIPE_WEBHOOK_SECRET` | Recording donations, refunds, account sync | Webhook returns 503 and refuses unsigned events |
-| `STRIPE_PRICE_DONOR_WALL` / `STRIPE_PRICE_SHOP` / `STRIPE_PRICE_CONTESTS` / `STRIPE_PRICE_EVERYTHING` | Yufora subscription billing (plan → Stripe Price map) | Billing off — every charity fully entitled (pre-billing behavior) |
+| `STRIPE_PRICE_DONOR_WALL` / `STRIPE_PRICE_SHOP` / `STRIPE_PRICE_CONTESTS` / `STRIPE_PRICE_GIVEAWAYS` / `STRIPE_PRICE_EVERYTHING` | Yufora subscription billing (plan → Stripe Price map) | Billing off — every charity fully entitled (pre-billing behavior) |
 | `STRIPE_BILLING_WEBHOOK_SECRET` | Subscription status sync (separate endpoint: `/api/webhooks/stripe-billing`, "events on your account") | Billing webhook returns 503; return-page sync still works |
 | `BILLING_TRIAL_DAYS` | Free live trial length (no card required) | No trial — plans charge at checkout |
 | `NEXT_PUBLIC_ALLOW_INDEXING` | Search engines may index | robots.txt disallows everything (correct for staging) |
+| `GIVEAWAYS_APPROVED_RULES_VERSION` | Giveaways can go live — must equal `RULES_TEMPLATE_VERSION` in `lib/giveaways/constants.ts`. Set in **Production only**, after counsel approves the Rules template. Editing the template bumps the version, which closes go-live until re-approved | Everything except going live works (build, preview, Rules preview); already-live giveaways are unaffected |
+| `GIVEAWAYS_SECRET` | HMAC root for giveaway entry/claim links and IP fingerprints; comma list to rotate (first signs, all verify) | Falls back to `BETTER_AUTH_SECRET` |
+| `GIVEAWAYS_EMAIL_FROM` | Optional from address for giveaway emails | Falls back to `DONOR_EMAIL_FROM`, then `LEAD_NOTIFY_FROM` |

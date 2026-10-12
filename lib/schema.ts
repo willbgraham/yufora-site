@@ -11,6 +11,7 @@ export const ROLES = [
 export const INTERESTS = [
   { value: "shop", label: "Wishlist shop" },
   { value: "donor-wall", label: "Donor wall" },
+  { value: "giveaways", label: "Prize giveaways" },
   { value: "managed-store", label: "Done-for-you shop / store" },
   // value stays "contests" — it's persisted in lead payloads.
   { value: "contests", label: "Referral contests" },

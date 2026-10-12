@@ -16,8 +16,13 @@ import { isStripeConfigured, stripe } from "@/lib/stripe";
  * which makes shipping this code deploy-safe at any time.
  */
 
-export type ProductKey = "donorWall" | "shop" | "contests";
-export type PlanKey = "donor-wall" | "shop" | "contests" | "everything";
+export type ProductKey = "donorWall" | "shop" | "contests" | "giveaways";
+export type PlanKey =
+  | "donor-wall"
+  | "shop"
+  | "contests"
+  | "giveaways"
+  | "everything";
 
 export type PlanDef = {
   key: PlanKey;
@@ -30,9 +35,12 @@ export type PlanDef = {
 };
 
 /**
- * Approved pricing (2026-08): Donor Wall $19 · Shop $49 · Contests $39 ·
- * Everything $79 (sold at $59 until contests ship). Amounts live on the
- * Stripe Prices, not here.
+ * Approved pricing: Donor Wall $19 · Shop $49 · Contests $39 ·
+ * Giveaways $49 · Everything $79. Everything is sold at $59 (donor wall +
+ * shop) until Giveaways open for going live; at that point a $79 price is
+ * PREPENDED to STRIPE_PRICE_EVERYTHING and the $59 id stays in the list,
+ * so existing subscribers are grandfathered. Amounts live on the Stripe
+ * Prices, not here.
  *
  * RE-PRICING: Stripe Prices are immutable, so a price change means
  * creating a NEW Price. Each env var therefore holds a COMMA-SEPARATED
@@ -47,7 +55,7 @@ const PLAN_DEFS: readonly PlanDef[] = [
     key: "everything",
     label: "Everything",
     env: "STRIPE_PRICE_EVERYTHING",
-    products: ["donorWall", "shop", "contests"],
+    products: ["donorWall", "shop", "contests", "giveaways"],
     blurb: "All Yufora tools, one flat number.",
   },
   {
@@ -56,6 +64,13 @@ const PLAN_DEFS: readonly PlanDef[] = [
     env: "STRIPE_PRICE_SHOP",
     products: ["shop"],
     blurb: "A real shop on your site. The money lands in your Stripe — we take none of it.",
+  },
+  {
+    key: "giveaways",
+    label: "Giveaways",
+    env: "STRIPE_PRICE_GIVEAWAYS",
+    products: ["giveaways"],
+    blurb: "A prize giveaway on your site — free entry for everyone, bonus entries for donors, Official Rules included.",
   },
   {
     key: "donor-wall",
@@ -156,6 +171,7 @@ export type Entitlements = {
   donorWall: boolean;
   shop: boolean;
   contests: boolean;
+  giveaways: boolean;
   plan: PlanKey | null;
   status: SubscriptionStatus | null;
   /**
@@ -183,8 +199,18 @@ function trialEndsSoon(status: SubscriptionStatus | null, trialEnd: Date | null)
   );
 }
 
-const ALL_ON = { donorWall: true, shop: true, contests: true } as const;
-const ALL_OFF = { donorWall: false, shop: false, contests: false } as const;
+const ALL_ON = {
+  donorWall: true,
+  shop: true,
+  contests: true,
+  giveaways: true,
+} as const;
+const ALL_OFF = {
+  donorWall: false,
+  shop: false,
+  contests: false,
+  giveaways: false,
+} as const;
 const NO_DATES = {
   cancelAtPeriodEnd: false,
   currentPeriodEnd: null,
@@ -264,6 +290,7 @@ export async function getEntitlementsForCharity(charity: {
     donorWall: products.has("donorWall"),
     shop: products.has("shop"),
     contests: products.has("contests"),
+    giveaways: products.has("giveaways"),
     plan: best ? (resolvePlan(best.stripePriceId)?.key ?? null) : null,
     status: best?.status ?? null,
     reason: "subscribed",
@@ -356,6 +383,7 @@ export async function getEntitlementsForCharities(
       donorWall: products.has("donorWall"),
       shop: products.has("shop"),
       contests: products.has("contests"),
+      giveaways: products.has("giveaways"),
       plan: resolvePlan(best.stripePriceId)?.key ?? null,
       status: best.status,
       reason: "subscribed",

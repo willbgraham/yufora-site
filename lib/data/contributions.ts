@@ -2,6 +2,7 @@ import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { contributions, products } from "@/lib/db/schema";
+import { csvField } from "@/lib/csv";
 
 export async function getContributionsForCharity(charityId: string) {
   return db
@@ -33,22 +34,6 @@ export async function getTotalsForCharity(charityId: string) {
     totalCents: Number(rows[0]?.totalCents ?? 0),
     count: Number(rows[0]?.count ?? 0),
   };
-}
-
-/**
- * CSV field escaping with formula-injection defense.
- *
- * RFC 4180 quoting handles delimiters/quotes/newlines. Separately, spreadsheet
- * apps execute a cell whose text begins with =, +, -, @, or a control char —
- * and donor names are attacker-controlled free text from Stripe checkout. We
- * prefix any such value with a single quote so Excel/Sheets treat it as text,
- * not a formula.
- */
-function csvField(value: string): string {
-  const guarded = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
-  return /[",\n\r]/.test(guarded)
-    ? `"${guarded.replace(/"/g, '""')}"`
-    : guarded;
 }
 
 export function contributionsToCsv(

@@ -27,13 +27,19 @@ const PLAN_LABELS: Record<string, string> = {
   shop: "Wishlist Shop",
   "donor-wall": "Donor Wall",
   contests: "Referral Contests",
+  giveaways: "Giveaways",
 };
 
 const PRODUCT_LABELS: Record<ProductKey, string> = {
   shop: "Wishlist Shop",
   donorWall: "Donor Wall",
   contests: "Referral Contests",
+  giveaways: "Giveaways",
 };
+
+function isProductKey(value: string | undefined): value is ProductKey {
+  return value !== undefined && Object.hasOwn(PRODUCT_LABELS, value);
+}
 
 const formatDate = (d: Date) =>
   d.toLocaleDateString("en-US", {
@@ -114,10 +120,7 @@ export default async function BillingPage({ searchParams }: Props) {
 
     // Bounced here from a gate (publish / connect wall) because the
     // current plan doesn't include that product — say so plainly.
-    const neededKey =
-      need === "shop" || need === "donorWall" || need === "contests"
-        ? (need as ProductKey)
-        : null;
+    const neededKey = isProductKey(need) ? need : null;
     const missingProduct =
       neededKey && !entitlements[neededKey] ? neededKey : null;
 
@@ -181,14 +184,22 @@ export default async function BillingPage({ searchParams }: Props) {
   const plans = await getPlansWithAmounts();
   const trialDays = Number(process.env.BILLING_TRIAL_DAYS ?? 0);
   const lapsed = entitlements.reason === "lapsed";
+  const neededProduct = isProductKey(need) ? need : null;
 
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="text-2xl">{lapsed ? "Restart your plan" : "Choose a plan"}</h1>
-      {portalNotice || errorNotice ? (
+      {portalNotice || errorNotice || neededProduct ? (
         <div className="mt-6">
           {portalNotice}
           {errorNotice}
+          {neededProduct && (
+            <Notice>
+              {neededProduct === "giveaways"
+                ? "Going live with a giveaway needs the Giveaways plan or Everything."
+                : `Going live needs a plan that includes the ${PRODUCT_LABELS[neededProduct]} — Everything covers all of them.`}
+            </Notice>
+          )}
         </div>
       ) : null}
       <p className="mt-2 max-w-xl text-warm-700">

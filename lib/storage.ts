@@ -40,7 +40,8 @@ export function photoValidationError(file: File): string | null {
 
 export async function savePhoto(
   file: File,
-  productId: string,
+  ownerId: string,
+  folder: "products" | "giveaways" = "products",
 ): Promise<string> {
   const ext = ALLOWED_TYPES[file.type];
   if (!ext) throw new Error("Unsupported image type");
@@ -49,7 +50,7 @@ export async function savePhoto(
 
   if (blobConfigured()) {
     const { put } = await import("@vercel/blob");
-    const blob = await put(`products/${productId}/${name}`, file, {
+    const blob = await put(`${folder}/${ownerId}/${name}`, file, {
       access: "public",
       contentType: file.type,
     });
@@ -64,13 +65,13 @@ export async function savePhoto(
 
   // Local dev: write to .uploads/ (gitignored), serve via /api/uploads.
   const { mkdir, writeFile } = await import("node:fs/promises");
-  const dir = path.join(process.cwd(), ".uploads", "products", productId);
+  const dir = path.join(process.cwd(), ".uploads", folder, ownerId);
   await mkdir(dir, { recursive: true });
   await writeFile(
     path.join(dir, name),
     Buffer.from(await file.arrayBuffer()),
   );
-  return `/api/uploads/products/${productId}/${name}`;
+  return `/api/uploads/${folder}/${ownerId}/${name}`;
 }
 
 /** Best-effort delete; storage orphans are acceptable, broken rows are not. */
