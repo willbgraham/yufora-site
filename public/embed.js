@@ -3,6 +3,9 @@
  *
  * Usage (paste where the shop should appear):
  *   <script src="https://yufora.com/embed.js" data-shop="your-shop" async></script>
+ * A giveaway's entry form:
+ *   <script src="https://yufora.com/embed.js" data-shop="your-shop"
+ *     data-widget="giveaway" data-giveaway="GIVEAWAY-ID" async></script>
  *
  * Injects an auto-resizing iframe right after the script tag. Height updates
  * come from the embedded page via postMessage; both the origin and the
@@ -37,6 +40,13 @@
     }
   } else if (widget === "ticker") {
     src += "/ticker";
+  } else if (widget === "giveaway") {
+    var giveaway = script.getAttribute("data-giveaway");
+    if (!giveaway || !/^[\w-]{1,64}$/.test(giveaway)) {
+      console.warn('[yufora] data-widget="giveaway" needs a data-giveaway id');
+      return;
+    }
+    src += "/giveaways/" + encodeURIComponent(giveaway);
   } else {
     // If the donor was just sent back from checkout, the charity's page URL
     // carries yufora_item / yufora_thanks — open the iframe straight to that
@@ -57,13 +67,13 @@
 
   var iframe = document.createElement("iframe");
   iframe.src = src;
-  iframe.title =
-    widget === "wall" || widget === "ticker" ? "Supporter wall" : "Wishlist shop";
+  var TITLES = { wall: "Supporter wall", ticker: "Supporter wall", giveaway: "Giveaway entry form" };
+  var HEIGHTS = { wall: "320px", ticker: "320px", giveaway: "720px" };
+  iframe.title = TITLES[widget] || "Wishlist shop";
   iframe.style.display = "block";
   iframe.style.width = "100%";
   iframe.style.border = "0";
-  iframe.style.height =
-    widget === "wall" || widget === "ticker" ? "320px" : "600px";
+  iframe.style.height = HEIGHTS[widget] || "600px";
   iframe.setAttribute("loading", "lazy");
 
   script.parentNode.insertBefore(iframe, script.nextSibling);
@@ -74,6 +84,16 @@
     var data = event.data;
     if (data && data.type === "yufora:height" && typeof data.height === "number") {
       iframe.style.height = Math.max(200, Math.ceil(data.height)) + "px";
+    }
+    // The entry form shrinks to a short message after submitting; bring it
+    // back into view if the visitor is left scrolled past it.
+    if (data && data.type === "yufora:scrollIntoView") {
+      var r = iframe.getBoundingClientRect();
+      if (r.top < 0 || r.top > window.innerHeight) {
+        var reduce =
+          window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        iframe.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+      }
     }
   });
 })();

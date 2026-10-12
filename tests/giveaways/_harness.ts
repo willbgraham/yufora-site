@@ -29,3 +29,15 @@ export function setupDb(): Promise<void> {
 }
 
 export { client, testDb, schema };
+
+export async function seedCharity(slug: string, ownerEmail = `${slug}-owner@example.com`) {
+  const [owner] = await testDb
+    .insert(schema.user)
+    .values({ name: "Owner", email: ownerEmail })
+    .returning();
+  const [charity] = await testDb
+    .insert(schema.charities)
+    .values({ name: `${slug} Foundation`, slug, ownerUserId: owner.id })
+    .returning();
+  return { owner, charity };
+}

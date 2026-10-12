@@ -11,6 +11,7 @@ import {
   type ProductKey,
 } from "@/lib/billing";
 import { getCharityForUser } from "@/lib/data/charity";
+import { hasRunningGiveaway } from "@/lib/data/giveaways";
 import { formatCents } from "@/lib/money";
 import { requireSession } from "@/lib/session";
 
@@ -181,7 +182,10 @@ export default async function BillingPage({ searchParams }: Props) {
   }
 
   // No live subscription — the plan picker. reason is "lapsed" or "none".
-  const plans = await getPlansWithAmounts();
+  const [plans, runningGiveaway] = await Promise.all([
+    getPlansWithAmounts(),
+    hasRunningGiveaway(charity.id),
+  ]);
   const trialDays = Number(process.env.BILLING_TRIAL_DAYS ?? 0);
   const lapsed = entitlements.reason === "lapsed";
   const neededProduct = isProductKey(need) ? need : null;
@@ -208,6 +212,12 @@ export default async function BillingPage({ searchParams }: Props) {
             Your plan has ended, so your shop and donor wall are paused for
             visitors. Nothing was deleted — pick a plan and everything comes
             straight back.
+            {runningGiveaway && (
+              <>
+                {" "}Your giveaway that&rsquo;s already live keeps running until its
+                winner is drawn — your Official Rules promise entrants that.
+              </>
+            )}
           </>
         ) : (
           <>

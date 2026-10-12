@@ -215,5 +215,6 @@ but nobody can self-serve a card update until it's saved).
 | `BILLING_TRIAL_DAYS` | Free live trial length (no card required) | No trial — plans charge at checkout |
 | `NEXT_PUBLIC_ALLOW_INDEXING` | Search engines may index | robots.txt disallows everything (correct for staging) |
 | `GIVEAWAYS_APPROVED_RULES_VERSION` | Giveaways can go live — must equal `RULES_TEMPLATE_VERSION` in `lib/giveaways/constants.ts`. Set in **Production only**, after counsel approves the Rules template. Editing the template bumps the version, which closes go-live until re-approved | Everything except going live works (build, preview, Rules preview); already-live giveaways are unaffected |
+| `GIVEAWAYS_ADMIN_ADDRESS` | Yufora's mailing address, printed as the Administrator in every giveaway's Official Rules | Going live stays closed (Rules can't freeze with a blank Administrator) |
 | `GIVEAWAYS_SECRET` | HMAC root for giveaway entry/claim links and IP fingerprints; comma list to rotate (first signs, all verify) | Falls back to `BETTER_AUTH_SECRET` |
 | `GIVEAWAYS_EMAIL_FROM` | Optional from address for giveaway emails | Falls back to `DONOR_EMAIL_FROM`, then `LEAD_NOTIFY_FROM` |

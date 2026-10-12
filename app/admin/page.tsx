@@ -12,6 +12,9 @@ import { getProductsForCharity } from "@/lib/data/products";
 import { formatCents } from "@/lib/money";
 import { isStripeConfigured } from "@/lib/stripe";
 import { requireSession } from "@/lib/session";
+import GiveawayAttentionStrip from "@/components/admin/giveaways/GiveawayAttentionStrip";
+import { getGiveawaysNeedingAttention } from "@/lib/data/giveaways";
+import { canUseGiveaways } from "@/lib/giveaways/flags";
 
 function StepBadge({
   tone,
@@ -49,10 +52,12 @@ export default async function AdminPage() {
     );
   }
 
-  const [items, totals, entitlements] = await Promise.all([
+  const giveawaysOn = canUseGiveaways(session.user.email);
+  const [items, totals, entitlements, attention] = await Promise.all([
     getProductsForCharity(charity.id),
     getTotalsForCharity(charity.id),
     getEntitlementsForCharity(charity),
+    giveawaysOn ? getGiveawaysNeedingAttention(charity.id, new Date()) : Promise.resolve([]),
   ]);
   const published = items.filter((p) => p.status === "published").length;
 
@@ -83,6 +88,17 @@ export default async function AdminPage() {
             >
               Donor wall
             </Link>
+            {giveawaysOn && (
+              <>
+                {" · "}
+                <Link
+                  href="/admin/giveaways"
+                  className="text-pink-700 hover:underline"
+                >
+                  Giveaways
+                </Link>
+              </>
+            )}
           </p>
         </div>
         {totals.count > 0 && (
@@ -150,6 +166,8 @@ export default async function AdminPage() {
           </Link>
         </div>
       )}
+
+      <GiveawayAttentionStrip items={attention} />
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         {/* Step 1 — products */}
