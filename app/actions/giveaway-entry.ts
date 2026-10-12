@@ -2,9 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import type { CheckoutState } from "@/app/actions/checkout";
 import {
   claimDailyEntry,
   confirmEntrant,
+  createDonationIntent,
   respondToClaim,
   submitEntry,
   type RequestCtx,
@@ -126,4 +128,17 @@ export async function respondToGiveawayClaim(
   refreshEntrantPage(fd);
   if (r.status === "error") return { status: "error", message: r.message };
   return { status: "done" };
+}
+
+/** Returns the Checkout URL; the client navigates window.top to it. */
+export async function startGiveawayDonation(
+  _prev: CheckoutState,
+  fd: FormData,
+): Promise<CheckoutState> {
+  const r = await createDonationIntent({
+    token: String(fd.get("t") ?? ""),
+    amountRaw: String(fd.get("amount") ?? ""),
+    ctx: await requestCtx(),
+  });
+  return r.status === "redirect" ? r : { status: "error", message: r.message };
 }

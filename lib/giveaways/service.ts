@@ -1,17 +1,20 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
+import type Stripe from "stripe";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../db";
 import {
   charities,
   giveawayCampaigns,
   giveawayClaims,
+  giveawayDonations,
   giveawayDraws,
   giveawayEntrants,
   user,
 } from "../db/schema";
+import { MIN_CONTRIBUTION_CENTS, isStripeConfigured, stripe } from "../stripe";
 import { hitAll } from "../throttle";
-import { CONFIRM_GRACE_MS } from "./constants";
+import { CONFIRM_GRACE_MS, DONATION_CUTOFF_MS } from "./constants";
 import { seedCommit } from "./draw-core";
 import {
   sendCharityClaimDeclined,
@@ -20,15 +23,17 @@ import {
   sendEntryLinkAgain,
   sendWinnerNotification,
 } from "./email";
-import { giveawayPhase } from "./entries";
-import { clockTime, dateTime, lastDay, longDate } from "./format";
+import { donationGrant, donationsOpen, giveawayPhase } from "./entries";
+import { clockTime, dateTime, lastDay, longDate, money } from "./format";
 import {
+  countActiveEntries,
   creditFreeEntries,
   lockCampaign,
   lockEntrant,
   type Campaign,
   type Entrant,
 } from "./ledger";
+import { checkoutDescription } from "./legal-copy";
 import {
   giveawayUrls,
   renderRules,
@@ -425,6 +430,140 @@ export async function claimDailyEntry(args: {
             : credit.reason,
     };
   });
+}
+
+export type DonationIntentResult =
+  | { status: "redirect"; url: string }
+  | { status: "error"; message: string };
+
+type CheckoutClient = Pick<Stripe, "checkout">;
+
+/**
+ * Starts a bonus-entry donation: a direct charge on the charity's own
+ * Stripe account. The donation row is written FIRST — the webhook only ever
+ * credits sessions Yufora created, for exactly the amount Yufora set — and
+ * the session expires before entries close, so every paid session was paid
+ * in time.
+ */
+export async function createDonationIntent(args: {
+  token: string | null;
+  amountRaw: string;
+  ctx: RequestCtx;
+  stripeClient?: CheckoutClient;
+}): Promise<DonationIntentResult> {
+  const { ctx } = args;
+  const r = await resolveEntrantToken(args.token, ctx.now);
+  if (!r.ok) return { status: "error", message: "This link doesn't work anymore." };
+  const { campaign: c, entrant } = r;
+  if (!entrant.confirmedAt || entrant.status !== "active") {
+    return { status: "error", message: "Confirm your entry first." };
+  }
+  if (c.status !== "live" || !c.centsPerEntry || !donationsOpen(c, ctx.now)) {
+    return {
+      status: "error",
+      message:
+        giveawayPhase(c, ctx.now) === "open" && c.endsAt.getTime() - ctx.now.getTime() < DONATION_CUTOFF_MS
+          ? "Bonus entries closed half an hour before the end. Your free entries still count."
+          : "Bonus entries aren't open right now.",
+    };
+  }
+  const charity = await loadCharityLite(c.charityId);
+  if (!charity || !isStripeConfigured() || !charity.stripeAccountId || !charity.stripeChargesEnabled) {
+    return { status: "error", message: "Donations aren't available for this giveaway right now." };
+  }
+
+  const cleaned = args.amountRaw.trim().replace(/[$,\s]/g, "");
+  if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) {
+    return { status: "error", message: "Enter an amount like 25." };
+  }
+  const amountCents = Math.round(parseFloat(cleaned) * 100);
+  const minimum = Math.max(MIN_CONTRIBUTION_CENTS, c.centsPerEntry);
+  if (amountCents < minimum) {
+    return { status: "error", message: `The smallest gift for a bonus entry is ${money(minimum)}.` };
+  }
+  if (amountCents > 1_000_000) {
+    return { status: "error", message: "For gifts over $10,000, please contact the organization directly." };
+  }
+  const current = await countActiveEntries(db, entrant.id);
+  const entries = donationGrant({
+    amountCents,
+    centsPerEntry: c.centsPerEntry,
+    perPersonCap: c.perPersonCap,
+    currentActive: current,
+  });
+  if (entries === 0) {
+    return { status: "error", message: `You've reached the ${c.perPersonCap}-entry limit. Thanks for playing!` };
+  }
+  const ok = await hitAll([
+    { key: `gw:donate:${entrant.id}`, limit: 10, windowSec: 3600 },
+    { key: `gw:donate:ip:${hashIdentifier("ip", ctx.ip)}`, limit: 20, windowSec: 3600 },
+  ]);
+  if (!ok) return { status: "error", message: "Too many tries. Please wait a little and try again." };
+
+  const [intent] = await db
+    .insert(giveawayDonations)
+    .values({
+      campaignId: c.id,
+      charityId: charity.id,
+      entrantId: entrant.id,
+      amountCents,
+      centsPerEntry: c.centsPerEntry,
+      stripeAccountId: charity.stripeAccountId,
+    })
+    .returning({ id: giveawayDonations.id });
+
+  const entryUrl = entryUrlFor(c, charity, entrant.id, ctx.now.getTime());
+  const metadata = {
+    yuforaKind: "giveaway",
+    yuforaDonationId: intent.id,
+    yuforaCharityId: charity.id,
+    yuforaCampaignId: c.id,
+    yuforaEntrantId: entrant.id,
+  };
+  try {
+    const client = args.stripeClient ?? stripe();
+    const session = await client.checkout.sessions.create(
+      {
+        mode: "payment",
+        submit_type: "donate",
+        customer_email: entrant.email,
+        client_reference_id: intent.id,
+        // Always before the end of entries (the cutoff guarantees it).
+        expires_at: Math.floor((ctx.now.getTime() + DONATION_CUTOFF_MS) / 1000),
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "usd",
+              unit_amount: amountCents,
+              product_data: {
+                name: `Donation to ${charity.name}`,
+                description: checkoutDescription({ entries, prizeName: c.prizeName }),
+              },
+            },
+          },
+        ],
+        metadata,
+        payment_intent_data: { metadata },
+        success_url: `${entryUrl}&donated=1`,
+        cancel_url: entryUrl,
+      },
+      { stripeAccount: charity.stripeAccountId },
+    );
+    if (!session.url) throw new Error("Checkout session has no URL");
+    await db
+      .update(giveawayDonations)
+      .set({ stripeCheckoutSessionId: session.id })
+      .where(and(eq(giveawayDonations.id, intent.id), sql`${giveawayDonations.stripeCheckoutSessionId} is null`));
+    return { status: "redirect", url: session.url };
+  } catch (err) {
+    console.error("[giveaways] checkout create failed", err);
+    await db
+      .update(giveawayDonations)
+      .set({ status: "expired" })
+      .where(and(eq(giveawayDonations.id, intent.id), eq(giveawayDonations.status, "pending")));
+    return { status: "error", message: "Couldn't start the donation — please try again in a moment." };
+  }
 }
 
 /* ======================================================================== */

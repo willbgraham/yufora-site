@@ -4,6 +4,11 @@ import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { charities, contributions, products, user } from "@/lib/db/schema";
 import { sendDonorConfirmation } from "@/lib/donor-email";
+import {
+  recordGiveawayCheckout,
+  recordGiveawayExpired,
+  recordGiveawayRefund,
+} from "@/lib/giveaways/webhook";
 import { siteConfig } from "@/lib/site";
 
 /**
@@ -15,6 +20,11 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
+      // Giveaway bonus-entry donations have their own ledger and checks
+      // (lib/giveaways/webhook.ts) and never touch contributions.
+      if (session.metadata?.yuforaKind === "giveaway") {
+        return recordGiveawayCheckout(event.account, session);
+      }
       if (session.payment_status !== "paid") return "ignored: not paid";
 
       const productId = session.metadata?.yuforaProductId;
@@ -141,6 +151,9 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
           : charge.payment_intent?.id;
       if (!paymentIntentId) return "ignored: no payment intent";
 
+      const giveaway = await recordGiveawayRefund(event.account, paymentIntentId);
+      if (giveaway !== null) return giveaway;
+
       // v1 treats any refund as a full refund of the contribution.
       const updated = await db
         .update(contributions)
@@ -168,6 +181,14 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string> {
         .where(eq(products.id, row.productId));
 
       return `refunded: ${row.id}`;
+    }
+
+    case "checkout.session.expired": {
+      const session = event.data.object;
+      if (session.metadata?.yuforaKind === "giveaway") {
+        return recordGiveawayExpired(event.account, session);
+      }
+      return "ignored: checkout.session.expired";
     }
 
     case "account.updated": {

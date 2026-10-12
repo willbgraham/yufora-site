@@ -28,6 +28,7 @@ import { verifyBeaconSignature } from "./drand-bls";
 import { sendLockReceipt } from "./email";
 import { dateTime } from "./format";
 import { lockCampaign } from "./ledger";
+import { reconcilePendingDonations } from "./reconcile";
 import { giveawayUrls } from "./rules-template";
 import { loadCharityLite, notifyClaim, staffEmails } from "./service";
 import type { Beacon } from "./types";
@@ -71,8 +72,10 @@ export async function lockPool(args: {
   userId: string | null;
   now: Date;
   drand?: DrandClient;
+  reconcile?: (campaignId: string) => Promise<unknown>;
 }): Promise<LockResult> {
   const drand = args.drand ?? defaultDrand;
+  const reconcile = args.reconcile ?? ((id: string) => reconcilePendingDonations(id));
   const [pre] = await db
     .select({
       status: giveawayCampaigns.status,
@@ -94,9 +97,18 @@ export async function lockPool(args: {
     };
   }
 
-  // Paid entries must never miss the pool: any donation still pending means
-  // a webhook may be on its way. Reconcile first (see reconcile.ts); refuse
-  // while anything is unresolved.
+  // Paid entries must never miss the pool: settle pending donations with
+  // Stripe first, and refuse while anything is unresolved (fail closed).
+  try {
+    await reconcile(args.campaignId);
+  } catch (err) {
+    console.error("[giveaways] reconcile before lock failed", err);
+    return {
+      status: "error",
+      code: "pending_donations",
+      message: "We couldn't confirm every donation with Stripe just now, so nothing was locked. Try again in a few minutes.",
+    };
+  }
   const [pending] = await db
     .select({ n: sql<number>`count(*)::int` })
     .from(giveawayDonations)

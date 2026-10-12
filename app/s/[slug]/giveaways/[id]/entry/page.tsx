@@ -5,6 +5,7 @@ import {
   confirmGiveawayEntry,
 } from "@/app/actions/giveaway-entry";
 import Container from "@/components/layout/Container";
+import BonusEntryForm from "@/components/giveaways/BonusEntryForm";
 import EntryMethodCard from "@/components/giveaways/EntryMethodCard";
 import TokenButton from "@/components/giveaways/TokenButton";
 import { getEntrantView } from "@/lib/data/giveaways";
@@ -148,9 +149,19 @@ export default async function EntrantPage({ params, searchParams }: Props) {
               </EntryMethodCard>
               {g.donationsEnabled && g.centsPerEntry && (
                 <EntryMethodCard title="Bonus entries with a donation">
-                  <p>
-                    Bonus entries open soon. Free entries count exactly the same.
-                  </p>
+                  {view.donationsOpen ? (
+                    <BonusEntryForm
+                      token={token}
+                      centsPerEntry={g.centsPerEntry}
+                      perPersonCap={g.perPersonCap}
+                      currentActive={totals.active}
+                    />
+                  ) : (
+                    <p>
+                      Bonus entries closed half an hour before the end. Your free
+                      entries count exactly the same.
+                    </p>
+                  )}
                 </EntryMethodCard>
               )}
             </div>

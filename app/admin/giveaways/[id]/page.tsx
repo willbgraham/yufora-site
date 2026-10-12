@@ -35,9 +35,6 @@ export const maxDuration = 60;
 
 export const metadata = { title: "Giveaway" };
 
-/** Bonus entries for donations arrive in the next phase. */
-const DONATIONS_AVAILABLE = false;
-
 function Card({ children }: { children: React.ReactNode }) {
   return <section className="rounded-xl border border-warm-200 bg-white p-6">{children}</section>;
 }
@@ -131,7 +128,6 @@ export default async function GiveawayWorkspace({ params }: { params: Promise<{ 
           <section className="rounded-xl border border-warm-200 bg-white p-6 sm:p-8">
             <GiveawayForm
               action={updateGiveaway.bind(null, g.id)}
-              donationsAvailable={DONATIONS_AVAILABLE}
               nowMs={now.getTime()}
               defaults={{
                 prizeName: g.prizeName,

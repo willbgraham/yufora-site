@@ -63,13 +63,10 @@ function Section({
 export default function GiveawayForm({
   action,
   defaults,
-  donationsAvailable,
   nowMs,
 }: {
   action: (prev: GiveawayFormState, fd: FormData) => Promise<GiveawayFormState>;
   defaults: GiveawayFormDefaults;
-  /** Bonus entries ship in a later phase; until then the toggle is hidden. */
-  donationsAvailable: boolean;
   /** Server render time — keeps the live summary identical on hydration. */
   nowMs: number;
 }) {
@@ -202,25 +199,19 @@ export default function GiveawayForm({
             {live.parity.text}
           </p>
         )}
-        {donationsAvailable ? (
-          <>
-            <label className="flex items-start gap-3 text-sm text-warm-800">
-              <input type="checkbox" name="donationsEnabled" checked={v.donationsEnabled} onChange={set("donationsEnabled")} className="mt-0.5 size-5 shrink-0 accent-pink-600" />
-              <span>
-                <span className="font-medium text-warm-900">Offer bonus entries for donations</span>
-                <span className="block text-warm-600">Gifts go straight to your Stripe account. Everyone can still reach the same limit free.</span>
-              </span>
-            </label>
-            {v.donationsEnabled && (
-              <div className="max-w-xs">
-                <label htmlFor="dollarsPerEntry" className="block text-sm font-medium text-warm-900">Dollars per bonus entry</label>
-                <input id="dollarsPerEntry" name="dollarsPerEntry" inputMode="numeric" value={v.dollarsPerEntry} onChange={set("dollarsPerEntry")} className={fieldBase} {...aria("dollarsPerEntry", true)} />
-                {err("dollarsPerEntry", "Whole dollars, $5 or more. $10 means a $50 gift adds 5 bonus entries.")}
-              </div>
-            )}
-          </>
-        ) : (
-          <input type="hidden" name="dollarsPerEntry" value="" />
+        <label className="flex items-start gap-3 text-sm text-warm-800">
+          <input type="checkbox" name="donationsEnabled" checked={v.donationsEnabled} onChange={set("donationsEnabled")} className="mt-0.5 size-5 shrink-0 accent-pink-600" />
+          <span>
+            <span className="font-medium text-warm-900">Offer bonus entries for donations</span>
+            <span className="block text-warm-600">Gifts go straight to your Stripe account. Everyone can still reach the same limit free.</span>
+          </span>
+        </label>
+        {v.donationsEnabled && (
+          <div className="max-w-xs">
+            <label htmlFor="dollarsPerEntry" className="block text-sm font-medium text-warm-900">Dollars per bonus entry</label>
+            <input id="dollarsPerEntry" name="dollarsPerEntry" inputMode="numeric" value={v.dollarsPerEntry} onChange={set("dollarsPerEntry")} className={fieldBase} {...aria("dollarsPerEntry", true)} />
+            {err("dollarsPerEntry", "Whole dollars, $5 or more. $10 means a $50 gift adds 5 bonus entries.")}
+          </div>
         )}
       </Section>
 
