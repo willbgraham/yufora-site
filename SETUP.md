@@ -177,6 +177,46 @@ Run against the deployed staging environment with a live Connect webhook
 
 ---
 
+## Part F — Giveaways (owner tasks)
+
+Giveaways are built and deployable today with going live **closed**:
+charities can build, preview and read their Official Rules; nobody can
+go live until the switch below is flipped.
+
+- [ ] **Counsel review** of `lib/giveaways/rules-template.ts` and
+      `lib/giveaways/legal-copy.ts` (the only counsel-facing text). Open
+      questions are listed at the top of each file and in the plan: age of
+      majority (AL/NE 19, MS 21), the "donation doesn't raise anyone's
+      limit" wording beside bonus entries, RI and other exclusions, whether
+      administering donation-linked promotions makes Yufora a professional
+      solicitor / commercial co-venturer, tax-deductibility language,
+      retention period, governing law/venue, all-alternates-fail.
+      **Any edit to either file must bump `RULES_TEMPLATE_VERSION`** in
+      `lib/giveaways/constants.ts`.
+- [ ] `GIVEAWAYS_ADMIN_ADDRESS` = Yufora, LLC's mailing address
+      (Production). It's printed as the Administrator in every set of Rules.
+- [ ] Stripe Prices (test + live):
+  - [ ] $49/mo Giveaways → `STRIPE_PRICE_GIVEAWAYS`
+  - [ ] $79/mo Everything → **prepend** to `STRIPE_PRICE_EVERYTHING`
+        (`price_79,price_59`) so $59 subscribers stay entitled
+  - [ ] Add both to the Customer Portal plan-switching catalog
+- [ ] Stripe webhook endpoint: also send `checkout.session.expired`
+      (optional — the pre-draw reconcile covers it).
+- [ ] **Rehearsal on a Preview deployment in Stripe test mode** (never a
+      fake giveaway on production — the database is shared):
+      `stripe listen --forward-connect-to localhost:3000/api/webhooks/stripe`
+      locally, or the staging endpoint. Enter, confirm, add a $25 gift at
+      $10/entry (expect +2), refund it (expect the 2 voided), draw, verify
+      on the results page, claim.
+- [ ] **Flip the switch:** `GIVEAWAYS_APPROVED_RULES_VERSION` =
+      `RULES_TEMPLATE_VERSION` in **Production only**, then redeploy. The
+      marketing pages switch their copy automatically.
+- [ ] Email charities that have drafts that going live is open.
+- [ ] Later: a daily job for "ended — draw your winner" and "winner didn't
+      claim" emails (the dashboard strip covers both until then).
+
+---
+
 ## Schema changes: push BEFORE deploying
 
 Drizzle generates explicit column lists, so code that knows about a new
