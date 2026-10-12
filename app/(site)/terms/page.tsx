@@ -14,13 +14,13 @@ export default function TermsPage() {
       <h1 className="mb-2 text-4xl">Terms</h1>
       <p className="mb-10 text-warm-600">
         Plain-English terms for using Yufora. A counsel-reviewed version will
-        replace this before full launch. Last updated July 2026.
+        replace this before full launch. Last updated October 2026.
       </p>
       <Prose>
         <h2>What Yufora is</h2>
         <p>
           Yufora, LLC provides fundraising tools (the wishlist shop, donor
-          walls, contests) and marketing services (films, design, Ad Grants,
+          walls, giveaways, contests) and marketing services (films, design, Ad Grants,
           email) for nonprofit organizations. Some tools are in early
           onboarding; where something isn&rsquo;t generally available yet, we
           say so on the site.
@@ -58,6 +58,21 @@ export default function TermsPage() {
           requests from their donors using the tools we provide.
         </p>
 
+        <h2>Giveaways</h2>
+        <p>
+          In a giveaway, <strong>the charity is the Sponsor</strong>: it sets,
+          provides and delivers the prize, and runs the giveaway under its
+          Official Rules and applicable law. <strong>Yufora is the
+          Administrator</strong>: it hosts the entry form and the Rules, sends
+          giveaway emails on the Sponsor&rsquo;s behalf, and conducts the
+          drawing. Yufora provides no prizes, isn&rsquo;t a party to bonus-entry
+          donations (those go to the charity through its own Stripe account),
+          and doesn&rsquo;t decide eligibility disputes, which belong to the
+          Sponsor. A charity agrees not to change or end a live giveaway except
+          as its Official Rules allow, and to collect any winner paperwork —
+          affidavits, releases, tax forms — directly.
+        </p>
+
         <h2>Read-only Stripe connections</h2>
         <p>
           Where a charity connects an existing Stripe account for the
@@ -87,9 +102,9 @@ export default function TermsPage() {
           Yufora is provided as-is while we build. We work hard to keep
           everything running and your data safe, but we can&rsquo;t promise
           uninterrupted service, and our liability is limited to what you paid
-          us. Nothing on this site is legal advice — contest and fundraising
-          rules vary by state, and you should confirm your situation with
-          qualified counsel.
+          us. Nothing on this site is legal advice — giveaway, contest and
+          fundraising rules vary by state, and you should confirm your
+          situation with qualified counsel.
         </p>
 
         <h2>Changes and contact</h2>

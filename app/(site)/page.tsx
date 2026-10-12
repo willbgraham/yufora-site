@@ -187,8 +187,8 @@ export default function Home() {
           <p className="text-lg text-warm-700">
             A film gives someone a reason to give. When you&rsquo;re ready, the
             same team builds the tools that make giving easy — a wishlist shop, a
-            live donor wall, and referral contests, all running on your own
-            website.
+            live donor wall, prize giveaways, and referral contests, all running
+            on your own website.
           </p>
           <p className="mt-4">
             <Link

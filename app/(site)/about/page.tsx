@@ -34,8 +34,8 @@ export default function AboutPage() {
         />
         <div className="mt-8 max-w-2xl space-y-4 text-warm-700">
           <p>
-            The wishlist shop and contests are the tools — ways to ask that live
-            on your own site. Yufora Films is the story that makes the ask land.
+            The wishlist shop, giveaways and contests are the tools — ways to
+            ask that live on your own site. Yufora Films is the story that makes the ask land.
             They&rsquo;re built to work together, but each one stands on its own.
           </p>
           <p>

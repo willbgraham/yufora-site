@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
 import localFont from "next/font/local";
-import { Analytics } from "@vercel/analytics/next";
+import AnalyticsWithRedaction from "@/components/AnalyticsWithRedaction";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -52,7 +52,7 @@ export default function RootLayout({
     <html lang="en" className={`${figtree.variable} ${libertinus.variable}`}>
       <body>
         {children}
-        <Analytics />
+        <AnalyticsWithRedaction />
       </body>
     </html>
   );

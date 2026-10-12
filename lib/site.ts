@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Yufora",
   tagline: "Films and fundraising tools for nonprofits.",
   description:
-    "Yufora makes short documentaries for nonprofits — plus a wishlist shop, live donor wall, and referral contests that run on your own website, with the money going straight into your own account.",
+    "Yufora makes short documentaries for nonprofits — plus a wishlist shop, live donor wall, prize giveaways, and referral contests that run on your own website, with the money going straight into your own account.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   email: "hello@yufora.com",
 } as const;
@@ -22,6 +22,7 @@ export const navGroups: NavEntry[] = [
       { href: "/platform", label: "The platform", desc: "All the tools, one overview" },
       { href: "/shop", label: "Wishlist shop", desc: "Fund the things you need" },
       { href: "/donor-wall", label: "Donor wall", desc: "Live giving on your site" },
+      { href: "/giveaways", label: "Giveaways", desc: "Prize giveaways that raise money" },
       { href: "/contests", label: "Contests", desc: "Grow your email list" },
     ],
   },
@@ -70,7 +71,8 @@ export const CTA_HREF = "/start";
  *
  * Deliberately NOT used by the services pages or by Referral Contests —
  * services are quoted, and contests aren't built yet. Sending either to
- * a signup screen would promise something we can't deliver.
+ * a signup screen would promise something we can't deliver. Giveaways use
+ * it with an explicit "build and preview" line until going live opens.
  */
 export const PRODUCT_CTA_LABEL = "Start free";
 export const PRODUCT_CTA_HREF = "/signin";

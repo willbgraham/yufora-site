@@ -20,10 +20,11 @@ export function isGiveawaysGoLiveOpen(): boolean {
 }
 
 /**
- * Who sees the Giveaways admin while it's being built (phases 1–2: staff
- * only). Flip to true when the marketing page ships (phase 3).
+ * Who can build giveaways in the admin. Everyone, now that the marketing
+ * page is public — going live is still gated by isGiveawaysGoLiveOpen().
+ * Set to false to hide the admin from non-staff again.
  */
-const GIVEAWAYS_OPEN_TO_ALL = false;
+const GIVEAWAYS_OPEN_TO_ALL = true;
 
 export function canUseGiveaways(email: string): boolean {
   return GIVEAWAYS_OPEN_TO_ALL || isStaffEmail(email);

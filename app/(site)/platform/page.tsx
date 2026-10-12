@@ -9,15 +9,17 @@ import Steps from "@/components/marketing/Steps";
 import FAQ from "@/components/marketing/FAQ";
 import DonorWallDemo from "@/components/marketing/DonorWallDemo";
 import LeadForm from "@/components/forms/LeadForm";
-import { CTA_HREF, PRODUCT_CTA_HREF, PRODUCT_CTA_LABEL } from "@/lib/site";
+import { isGiveawaysGoLiveOpen } from "@/lib/giveaways/flags";
+import { PRODUCT_CTA_HREF, PRODUCT_CTA_LABEL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "The Yufora platform — tools that run on your own site",
   description:
-    "A wishlist shop, a live donor wall, and referral contests — nonprofit fundraising tools that run on your own website, with the money going straight into your own account.",
+    "A wishlist shop, a live donor wall, prize giveaways and referral contests — nonprofit fundraising tools that run on your own website, with the money going straight into your own account.",
 };
 
 export default function Platform() {
+  const giveawaysOpen = isGiveawaysGoLiveOpen();
   return (
     <>
       {/* 1 — Hero */}
@@ -28,9 +30,10 @@ export default function Platform() {
             Show your donors exactly what you need.
           </h1>
           <p className="mt-6 max-w-2xl text-xl text-warm-700">
-            Yufora gives nonprofits a wishlist shop and referral contests that
-            run on your own website — so your supporters never leave your page,
-            and every dollar lands in your account, not ours.
+            Yufora gives nonprofits a wishlist shop, prize giveaways and
+            referral contests that run on your own website — so your supporters
+            never leave your page, and every dollar lands in your account, not
+            ours.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <ButtonLink href={PRODUCT_CTA_HREF} size="lg">
@@ -187,8 +190,43 @@ export default function Platform() {
         </div>
       </Section>
 
-      {/* 6 — Contests */}
-      <Section labelledBy="contests-heading">
+      {/* 6 — Giveaways */}
+      <Section labelledBy="giveaways-heading">
+        <SectionHeading
+          id="giveaways-heading"
+          eyebrow="Giveaways"
+          title="Run a prize giveaway that raises money."
+          lead="Anyone can enter free, donors get bonus entries, and when it ends the winner is drawn in a way anyone can check. The Official Rules are written for you and locked when you go live."
+        />
+        <div className="mt-10">
+          <FeatureList
+            items={[
+              {
+                title: "Free entry, plus bonus entries",
+                body: "Everyone can enter free once a day; donors get bonus entries at a rate you set — and everyone can reach the same limit free.",
+              },
+              {
+                title: "A draw nobody controls",
+                body: "Sealed at launch, decided by a public random number, published with every step on a results page.",
+              },
+              {
+                title: "Official Rules, built for you",
+                body: "Your organization is the Sponsor; Yufora runs the form, the emails and the draw.",
+              },
+              {
+                title: "Donations go to your Stripe",
+                body: "Bonus-entry gifts settle in your own account. We take no cut.",
+              },
+            ]}
+          />
+        </div>
+        <ButtonLink href="/giveaways" variant="ghost" className="mt-8">
+          More about giveaways →
+        </ButtonLink>
+      </Section>
+
+      {/* 6a — Contests */}
+      <Section tone="tint" labelledBy="contests-heading">
         <SectionHeading
           id="contests-heading"
           eyebrow="Contests"
@@ -223,7 +261,7 @@ export default function Platform() {
       </Section>
 
       {/* 6b — Donor wall (the start-here product) */}
-      <Section tone="tint" labelledBy="wall-heading">
+      <Section labelledBy="wall-heading">
         <div className="grid items-center gap-8 lg:grid-cols-[3fr_2fr]">
           <div>
             <Eyebrow>New — the donor wall</Eyebrow>
@@ -344,6 +382,9 @@ export default function Platform() {
             {[
               "The donor wall is live and self-serve — sign up, connect your existing Stripe, and be up today.",
               "The wishlist shop is live and self-serve too. Build it free, publish when you're ready.",
+              giveawaysOpen
+                ? "Giveaways are live and self-serve. Build one free, and pay when it goes live."
+                : "Giveaways are built. Set one up and preview it today — going live opens once our legal review of the Official Rules is complete.",
               "Referral contests are in build. Get in touch and you'll be in the first group to run one.",
               "The services — films, content packs, Ad Grants, email — are live now, quoted per project.",
             ].map((s) => (
@@ -363,7 +404,7 @@ export default function Platform() {
         <SectionHeading
           align="center"
           title="What it costs."
-          lead="Flat monthly pricing, published in full: $19 for the donor wall, $49 for the wishlist shop, $79 for everything. No setup fee, no annual contract, and nothing taken from donations you'd have received anyway. Free to build — you only pay when you go live."
+          lead="Flat monthly pricing, published in full: $19 for the donor wall, $49 for the wishlist shop, $49 for Giveaways, and one price for everything. No setup fee, no annual contract, and nothing taken from donations you'd have received anyway. Free to build — you only pay when you go live."
         />
         <div className="mt-8 text-center">
           <ButtonLink href="/pricing" variant="secondary" size="lg">
@@ -395,8 +436,8 @@ export default function Platform() {
                 a: "That's the typical case, and it's what Stripe's nonprofit setup expects. Talk to us if your situation is different.",
               },
               {
-                q: "Are referral contests legal to run?",
-                a: "Run properly, yes. Free entry with no purchase or donation required makes it a sweepstakes, not a lottery — and clear Official Rules are what regulators expect to see. We generate those rules for your contest and flag anything specific to your state.",
+                q: "Are giveaways and contests legal to run?",
+                a: "Run properly, yes. Free entry with no purchase or donation required makes it a sweepstakes, not a lottery — and clear Official Rules are what regulators expect to see. We generate those rules from your settings, keep prizes under $5,000, and exclude the states with extra requirements.",
               },
               {
                 q: "Who owns the donor and entrant data?",
@@ -404,7 +445,9 @@ export default function Platform() {
               },
               {
                 q: "When can we start?",
-                a: "Right now, by yourself — the donor wall and the wishlist shop are self-serve. Enter your email, build it, publish when you're ready. Referral contests are still in build, and the services are quoted per project.",
+                a: giveawaysOpen
+                  ? "Right now, by yourself — the donor wall, the wishlist shop and Giveaways are self-serve. Enter your email, build it, publish when you're ready. Referral contests are still in build, and the services are quoted per project."
+                  : "Right now, by yourself — the donor wall and the wishlist shop are self-serve. Giveaways can be built and previewed today; going live opens after our legal review. Referral contests are still in build, and the services are quoted per project.",
               },
               {
                 q: "We're not ready to move our donations. Can we still use Yufora?",
@@ -416,7 +459,9 @@ export default function Platform() {
               },
               {
                 q: "What does it cost?",
-                a: "$19/mo for the donor wall, $49 for the wishlist shop, $79 for everything — flat, month to month, with no setup fee and nothing taken from your donations. Building is free; you pay only when you go live. Services are quoted separately, up front.",
+                a: giveawaysOpen
+                  ? "$19/mo for the donor wall, $49 for the wishlist shop, $49 for Giveaways, $79 for everything — flat, month to month, with no setup fee and nothing taken from your donations. Building is free; you pay only when you go live. Services are quoted separately, up front."
+                  : "$19/mo for the donor wall, $49 for the wishlist shop, $49 for Giveaways, and $59 for everything today ($79 once Giveaways open, with today's subscribers keeping $59) — flat, month to month, with no setup fee and nothing taken from your donations. Building is free; you pay only when you go live. Services are quoted separately, up front.",
               },
             ]}
           />

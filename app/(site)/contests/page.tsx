@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Section from "@/components/layout/Section";
 import SectionHeading from "@/components/marketing/SectionHeading";
 import FeatureList from "@/components/marketing/FeatureList";
@@ -61,7 +62,7 @@ export default function ContestsPage() {
           id="c-rules"
           eyebrow="The rules, handled"
           title="You pick how winning works."
-          lead="A giveaway with free entry is a sweepstakes, and sweepstakes have rules. Yufora generates the Official Rules for your contest and builds the mechanics that keep you inside them."
+          lead="A contest with free entry is a sweepstakes, and sweepstakes have rules. Yufora generates the Official Rules for your contest and builds the mechanics that keep you inside them."
         />
         <div className="mt-10">
           <FeatureList
@@ -125,6 +126,12 @@ export default function ContestsPage() {
           title="Referral contests are in build."
           lead="We're building this with our first partner nonprofits now, and we won't tell you it's live before it is. Get in touch and you'll be in the first group to run one — and you'll help shape how it works."
         />
+        <p className="mt-6 text-warm-700">
+          Want to raise money with a prize instead?{" "}
+          <Link href="/giveaways" className="font-medium text-pink-700 hover:underline">
+            That&rsquo;s what Giveaways are for →
+          </Link>
+        </p>
       </Section>
 
       <Section>

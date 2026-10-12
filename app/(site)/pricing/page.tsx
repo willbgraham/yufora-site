@@ -5,6 +5,7 @@ import SectionHeading from "@/components/marketing/SectionHeading";
 import Eyebrow from "@/components/marketing/Eyebrow";
 import FAQ from "@/components/marketing/FAQ";
 import { ButtonLink } from "@/components/ui/Button";
+import { isGiveawaysGoLiveOpen } from "@/lib/giveaways/flags";
 import {
   CTA_HREF,
   PRODUCT_CTA_HREF,
@@ -22,13 +23,22 @@ export const metadata: Metadata = {
  * come from the Stripe Prices behind STRIPE_PRICE_* (see lib/billing.ts).
  * Keep the two in step when re-pricing.
  */
-const PLANS = [
+type Availability = "live" | "preview" | "in-build";
+
+const plans = (giveawaysOpen: boolean): {
+  name: string;
+  price: string;
+  tagline: string;
+  href: string;
+  available: Availability;
+  points: string[];
+}[] => [
   {
     name: "Donor wall",
     price: "$19",
     tagline: "Live giving on your website.",
     href: "/donor-wall",
-    available: true,
+    available: "live",
     points: [
       "Money raised this month, updating live",
       "Gifts as they happen — anonymous by design",
@@ -41,7 +51,7 @@ const PLANS = [
     price: "$49",
     tagline: "Fund the things you actually need.",
     href: "/shop",
-    available: true,
+    available: "live",
     points: [
       "Real items, real prices, full or partial funding",
       "Runs on your own site — donors never leave",
@@ -50,11 +60,24 @@ const PLANS = [
     ],
   },
   {
+    name: "Giveaways",
+    price: "$49",
+    tagline: "A prize giveaway that raises money.",
+    href: "/giveaways",
+    available: giveawaysOpen ? "live" : "preview",
+    points: [
+      "Free entry for everyone, bonus entries for donors",
+      "Official Rules written for your giveaway",
+      "A winner drawn in a way anyone can check",
+      "Donations go straight to your Stripe account",
+    ],
+  },
+  {
     name: "Referral contests",
     price: "$39",
     tagline: "Grow your email list.",
     href: "/contests",
-    available: false,
+    available: "in-build",
     points: [
       "Personal share links that earn entries",
       "Random draw or top-referrer leaderboard",
@@ -65,6 +88,7 @@ const PLANS = [
 ];
 
 export default function PricingPage() {
+  const giveawaysOpen = isGiveawaysGoLiveOpen();
   return (
     <>
       <Section tone="tint">
@@ -87,14 +111,18 @@ export default function PricingPage() {
           Plans
         </h2>
 
-        <div className="grid gap-5 lg:grid-cols-3">
-          {PLANS.map((plan) => (
+        <div className="grid gap-5 sm:grid-cols-2">
+          {plans(giveawaysOpen).map((plan) => (
             <div
               key={plan.name}
               className="flex flex-col rounded-xl border border-warm-200 bg-white p-6"
             >
               <div className="flex items-baseline justify-between gap-3">
-                <h3 className="text-lg text-warm-900">{plan.name}</h3>
+                <h3 className="text-lg text-warm-900">
+                  <Link href={plan.href} className="hover:text-pink-700">
+                    {plan.name}
+                  </Link>
+                </h3>
                 <p className="font-display text-3xl text-warm-900">
                   {plan.price}
                   <span className="text-base font-normal text-warm-600">
@@ -113,7 +141,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              {plan.available ? (
+              {plan.available === "live" ? (
                 <ButtonLink
                   href={PRODUCT_CTA_HREF}
                   variant="secondary"
@@ -121,6 +149,15 @@ export default function PricingPage() {
                 >
                   {PRODUCT_CTA_LABEL}
                 </ButtonLink>
+              ) : plan.available === "preview" ? (
+                <div className="mt-6">
+                  <ButtonLink href={PRODUCT_CTA_HREF} variant="secondary" className="w-full">
+                    Start building
+                  </ButtonLink>
+                  <p className="mt-2 text-center text-sm text-warm-600">
+                    Build now — going live opens after legal review
+                  </p>
+                </div>
               ) : (
                 <p className="mt-6 rounded-md bg-warm-50 px-3 py-2.5 text-center text-sm text-warm-600">
                   In build —{" "}
@@ -139,20 +176,30 @@ export default function PricingPage() {
             <div>
               <h3 className="text-xl text-warm-900">Everything</h3>
               <p className="mt-1 text-warm-700">
-                All three tools, one flat number — about 26% less than buying
-                them separately.
+                Every Yufora tool, one flat number.
               </p>
             </div>
             <p className="font-display text-4xl text-warm-900">
-              $79
+              {giveawaysOpen ? "$79" : "$59"}
               <span className="text-base font-normal text-warm-600">/mo</span>
             </p>
           </div>
           <p className="mt-4 text-sm text-warm-700">
-            Referral contests aren&rsquo;t built yet, so until they ship
-            it&rsquo;s <strong>$59/mo</strong> for the donor wall and the
-            wishlist shop — and it becomes the full $79 plan when contests
-            launch. No surprise re-pricing.
+            {giveawaysOpen ? (
+              <>
+                The donor wall, the wishlist shop, and Giveaways — $117 if you
+                bought them separately. Referral contests join the plan when
+                they launch, at no extra cost.
+              </>
+            ) : (
+              <>
+                Today it&rsquo;s <strong>$59/mo</strong> for the donor wall and
+                the wishlist shop. It becomes $79 when Giveaways open for going
+                live, and includes them. Already on Everything at $59? You keep
+                that price, and get Giveaways when they open. No surprise
+                re-pricing.
+              </>
+            )}
           </p>
           <ButtonLink href={PRODUCT_CTA_HREF} size="lg" className="mt-6">
             {PRODUCT_CTA_LABEL}
@@ -222,7 +269,7 @@ export default function PricingPage() {
               },
               {
                 q: "What happens if we stop paying?",
-                a: "Your public shop and wall pause — visitors see a short \"temporarily unavailable\" note rather than a broken page — and everything you built stays exactly where it is. Resubscribe and it's all back, instantly.",
+                a: "Your public shop and wall pause — visitors see a short \"temporarily unavailable\" note rather than a broken page — and everything you built stays exactly where it is. Resubscribe and it's all back, instantly. A giveaway that's already live keeps running until its winner is drawn, because its Official Rules promise entrants that.",
               },
               {
                 q: "Do we need a card for the trial?",
@@ -231,6 +278,14 @@ export default function PricingPage() {
               {
                 q: "Can we switch plans later?",
                 a: "Yes, any time, from your billing page. Start with the donor wall and add the shop when you're ready, or go straight to Everything.",
+              },
+              {
+                q: "What's the difference between Giveaways and Referral contests?",
+                a: "A giveaway raises money: anyone enters free, donors get bonus entries, and one winner is drawn. A referral contest grows your email list: people earn entries by bringing friends. Giveaways are built; referral contests are still in build.",
+              },
+              {
+                q: "Do you take a cut of giveaway donations?",
+                a: "No — same as the wishlist shop. Bonus-entry donations go through Stripe straight into your organization's own account.",
               },
               {
                 q: "What about the services — films, Ad Grants, email?",

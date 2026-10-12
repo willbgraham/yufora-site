@@ -15,7 +15,7 @@ export default function PrivacyPage() {
       <p className="mb-10 text-warm-600">
         Written in plain English on purpose. A counsel-reviewed version will
         replace this before full launch — but everything below is how the
-        product actually works today. Last updated July 2026.
+        product actually works today. Last updated October 2026.
       </p>
       <Prose>
         <h2>Who we are</h2>
@@ -40,7 +40,15 @@ export default function PrivacyPage() {
           because there are none), your organization&rsquo;s details, and the
           content you create: products, photos, and settings. Signing in sets
           a session cookie; it&rsquo;s the only kind of cookie we use.
-          <strong> This site runs no analytics or advertising trackers.</strong>
+        </p>
+
+        <h2>Analytics</h2>
+        <p>
+          We use Vercel Web Analytics to count page visits. It sets no
+          cookies, doesn&rsquo;t follow you across other sites, and doesn&rsquo;t
+          build a profile of you. Personal links — like a giveaway entry or
+          prize-claim link — have their private part removed before anything
+          is counted. <strong>We run no advertising trackers.</strong>
         </p>
 
         <h2>If you donate through a Yufora shop</h2>
@@ -53,6 +61,28 @@ export default function PrivacyPage() {
           you supported. That record belongs to the charity you gave to; we
           process it on their behalf and never use it for our own marketing,
           never sell it, and never contact you except to confirm your gift.
+        </p>
+
+        <h2>If you enter a giveaway</h2>
+        <p>
+          The nonprofit running the giveaway is its <strong>Sponsor</strong>;
+          Yufora is the <strong>Administrator</strong> that runs the entry form,
+          the emails and the drawing on their behalf. We collect your first
+          and last name, email, state, the confirmations you ticked, and a log
+          of your entries (when, and whether free or bonus), plus a one-way
+          fingerprint of your network address to spot automated entries — never
+          the address itself. If you donate for bonus entries, the payment
+          works exactly like a shop donation above.
+        </p>
+        <p>
+          The Sponsor receives your details to run the giveaway and contact the
+          winner. It adds you to its own mailing list <strong>only if you
+          ticked that box</strong>. We never market to entrants and never sell
+          their details. Public results show anonymous entry numbers only; the
+          winner&rsquo;s first name and last initial appear only if they agreed
+          when entering. Anything else a winner must provide — like a tax form
+          — goes directly to the Sponsor; Yufora never collects Social Security
+          numbers.
         </p>
 
         <h2>The donor wall</h2>
@@ -78,7 +108,8 @@ export default function PrivacyPage() {
         <h2>Email</h2>
         <p>
           We send email through Resend (our email provider): sign-in links,
-          donation confirmations, and replies to things you sent us. Every
+          donation confirmations, giveaway entry confirmations and winner
+          notices, and replies to things you sent us. Every
           email has a real reply path to a human.
         </p>
 
